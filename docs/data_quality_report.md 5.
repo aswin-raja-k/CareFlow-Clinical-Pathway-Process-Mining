@@ -1,0 +1,62 @@
+# Data Validation & Quality Report
+
+**Date:** 13 October 2026  
+**Source file:** `Sepsis Cases - Event Log.csv`  
+**Scope:** Case IDs (`case:concept:name`), activity names (`concept:name`), event timestamps (`time:timestamp`), duplicate records, and within-case chronological order.
+
+## 1. Dataset overview
+
+- **Rows:** 15,214
+- **Columns:** 33
+- **Distinct non-missing case IDs:** 1,049
+- **Timestamp range after parsing:** 2013-11-07 08:18:29+00:00 to 2015-06-05 12:25:11+00:00
+
+## 2. Missing-value checks
+
+| Field | Missing values | Result |
+|---|---:|---|
+| Case ID (`case:concept:name`) | 24 | Issue found |
+| Activity name (`concept:name`) | 0 | Pass |
+| Timestamp (`time:timestamp`) | 0 | Pass |
+
+The 24 rows with missing case IDs occur together at source rows 442–465 (1-based row numbers). Their activity names and timestamps are present, but they cannot reliably be assigned to a case from the case ID field alone.
+
+## 3. Duplicate-record checks
+
+- **Exact duplicate rows across all columns:** 0
+- **Repeated `(case ID, activity name, timestamp)` combinations:** 7 combinations, affecting 14 rows (7 extra occurrence(s) beyond one per combination).
+- **Repeated `(case ID, timestamp)` combinations regardless of activity:** 3074 combinations.
+
+The repeated event keys are not automatically proof of erroneous data: repeated measurements or legitimate same-time events may occur. Review the source context before deciding whether any event is redundant.
+
+## 4. Invalid timestamp checks
+
+- Missing timestamps: **0**
+- Non-empty timestamps that could not be parsed: **0**
+- Parsed timestamp range: **2013-11-07 08:18:29+00:00** to **2015-06-05 12:25:11+00:00**
+
+All non-empty timestamp values parsed successfully. No malformed timestamp values were detected by the parser. This check does not independently establish that every timestamp is clinically plausible; domain-specific bounds should be confirmed if required.
+
+## 5. Chronological event order within each case
+
+Events were checked in their existing source-row order, comparing each valid timestamp with the preceding timestamp for the same non-missing case ID.
+
+- Cases with a timestamp moving backwards: **0**
+- Backwards timestamp transitions detected: **0**
+
+No chronological regressions were detected in the source-row order for cases with available case IDs and parseable timestamps. Rows with missing case IDs could not be validated for within-case order.
+
+## 6. Recommended cleaning actions (no records deleted)
+
+1. **Resolve missing case IDs:** inspect the source system or original export for the 24 affected rows. Do not infer case IDs solely from neighboring rows without evidence.
+2. **Review repeated event keys:** inspect the 7 repeated `(case ID, activity name, timestamp)` combinations against the original event source. Keep legitimate repeated observations; flag only confirmed duplicates.
+3. **Preserve original timestamps:** retain the raw timestamp field and document any future corrections. No malformed values were found in this check.
+4. **Re-run chronology validation:** repeat the per-case ordering check after missing case IDs are resolved, and verify any case-level exceptions with domain owners.
+5. **Keep an audit trail:** record any approved corrections in a separate change log, including the original value, corrected value, reason, and approval.
+6. **Do not delete records at this stage:** this report is diagnostic only; no source records were removed or modified.
+
+## 7. Overall assessment
+
+The main confirmed issue is **24 missing case IDs**. The dataset also contains **7 repeated event-key combinations** requiring review. Activity names and timestamps have no missing values, all provided timestamps parse successfully, and no within-case chronological regressions were detected among rows that could be grouped by case ID.
+
+**Status:** Validation completed; review and approval are recommended before any cleaning changes.

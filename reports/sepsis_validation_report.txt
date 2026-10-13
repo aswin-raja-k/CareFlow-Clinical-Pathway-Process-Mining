@@ -1,0 +1,22 @@
+CAREFLOW — SEPSIS EVENT-LOG VALIDATION
+==========================================
+CSV file: sepsis_event_log.csv
+Total rows: 15,214
+Total columns: 32
+Unique non-null case IDs: 1,049
+Unique non-null activities: 16
+Missing case IDs: 24
+Missing activity names: 0
+Missing or invalid timestamps: 0
+Duplicate full rows: 1
+Rows with all three required fields usable: 15,190
+Within-case chronological inversions: 0
+
+Timestamp limitation:
+The source documentation states that timestamps were
+randomised. Interpret calendar-based conclusions cautiously.
+
+No source records were deleted or overwritten by this script.
+Cleaning decisions and process discovery remain pending review.
+Earliest usable timestamp: 2013-11-07 07:18:29+00:00
+Latest usable timestamp: 2015-06-05 10:25:11+00:00

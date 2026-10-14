@@ -102,8 +102,85 @@ WHERE `concept:name` IS NOT NULL
 GROUP BY `concept:name`
 ORDER BY event_count DESC;
 
+
 -- =====================================================
--- 7. KPI 1: AVERAGE EVENTS PER CASE
+-- 7. CHECK FOR DUPLICATE EVENT ROWS
+-- Excludes event_id because it is a generated database key.
+-- Compare source columns to identify exact duplicate records.
+
+SELECT
+    InfectionSuspected,
+    `org:group`,
+    DiagnosticBlood,
+    DisfuncOrg,
+    SIRSCritTachypnea,
+    Hypotensie,
+    SIRSCritHeartRate,
+    Infusion,
+    DiagnosticArtAstrup,
+    `concept:name`,
+    Age,
+    DiagnosticIC,
+    DiagnosticSputum,
+    DiagnosticLiquor,
+    DiagnosticOther,
+    SIRSCriteria2OrMore,
+    DiagnosticXthorax,
+    SIRSCritTemperature,
+    `time:timestamp`,
+    DiagnosticUrinaryCulture,
+    SIRSCritLeucos,
+    Oligurie,
+    DiagnosticLacticAcid,
+    `lifecycle:transition`,
+    Diagnose,
+    Hypoxie,
+    DiagnosticUrinarySediment,
+    DiagnosticECG,
+    `case:concept:name`,
+    Leucocytes,
+    CRP,
+    LacticAcid,
+    COUNT(*) AS duplicate_count
+FROM sepsis_event_log
+GROUP BY
+    InfectionSuspected,
+    `org:group`,
+    DiagnosticBlood,
+    DisfuncOrg,
+    SIRSCritTachypnea,
+    Hypotensie,
+    SIRSCritHeartRate,
+    Infusion,
+    DiagnosticArtAstrup,
+    `concept:name`,
+    Age,
+    DiagnosticIC,
+    DiagnosticSputum,
+    DiagnosticLiquor,
+    DiagnosticOther,
+    SIRSCriteria2OrMore,
+    DiagnosticXthorax,
+    SIRSCritTemperature,
+    `time:timestamp`,
+    DiagnosticUrinaryCulture,
+    SIRSCritLeucos,
+    Oligurie,
+    DiagnosticLacticAcid,
+    `lifecycle:transition`,
+    Diagnose,
+    Hypoxie,
+    DiagnosticUrinarySediment,
+    DiagnosticECG,
+    `case:concept:name`,
+    Leucocytes,
+    CRP,
+    LacticAcid
+HAVING COUNT(*) > 1;
+
+
+-- =====================================================
+-- 8. KPI 1: AVERAGE EVENTS PER CASE
 -- =====================================================
 
 SELECT AVG(events_per_case) AS avg_events_per_case
@@ -117,7 +194,7 @@ FROM (
 ) AS case_event_counts;
 
 -- =====================================================
--- 8. KPI 2: AVERAGE CASE DURATION IN MINUTES
+-- 9. KPI 2: AVERAGE CASE DURATION IN MINUTES
 -- Duration = last event time - first event time.
 -- =====================================================
 
@@ -137,7 +214,7 @@ FROM (
 ) AS case_durations;
 
 -- =====================================================
--- 9. KPI 3: AVERAGE TIME BETWEEN CONSECUTIVE EVENTS
+-- 10. KPI 3: AVERAGE TIME BETWEEN CONSECUTIVE EVENTS
 -- Requires MySQL 8.0+ because it uses LAG().
 -- =====================================================
 
@@ -161,7 +238,7 @@ FROM ordered_events
 WHERE previous_event_time IS NOT NULL;
 
 -- =====================================================
--- 10. KPI 4: PERCENTAGE OF CASES WITH REPEATED ACTIVITIES
+-- 11. KPI 4: PERCENTAGE OF CASES WITH REPEATED ACTIVITIES
 -- Repetition may indicate rework; it is not proof of error.
 -- =====================================================
 
@@ -191,9 +268,8 @@ SELECT
 FROM case_repeat_flags;
 
 -- =====================================================
--- 11. KPI 5: PERCENTAGE OF CASES WITH A RETURN TO ER
--- Uses the exact activity label "Return ER".
--- =====================================================
+-- 12.  KPI 5: PERCENTAGE OF VALID CASES WITH A RETURN TO ER
+-- Formula: cases containing "Return ER" / all valid cases * 100
 
 SELECT
     100.0 * COUNT(DISTINCT CASE

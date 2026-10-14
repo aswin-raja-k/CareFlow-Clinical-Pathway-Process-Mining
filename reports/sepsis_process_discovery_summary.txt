@@ -1,0 +1,23 @@
+CAREFLOW — INITIAL SEPSIS PROCESS DISCOVERY
+================================================
+Source rows: 15,214
+Rows with missing case IDs: 24
+Rows with missing activity names: 0
+Rows with invalid/missing timestamps: 0
+Usable rows before deduplication: 15,190
+Duplicate model-field rows removed: 7
+Events in working log: 15,183
+Cases in working log: 1,049
+Activities in working log: 16
+
+Model: Inductive Miner process tree
+Prepared log: outputs\prepared_sepsis_event_log.csv
+Visualization: outputs\sepsis_process_tree.png
+
+Limitations:
+- Events without case, activity, or valid timestamp are excluded.
+- Duplicate removal applies only to the three model fields.
+- Original source CSV was not modified.
+- Source documentation says timestamps were randomized.
+- Do not interpret calendar trends as real clinical trends.
+- This is an initial discovered model, not a clinical conclusion.

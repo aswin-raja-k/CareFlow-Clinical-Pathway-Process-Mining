@@ -311,6 +311,34 @@ FROM sepsis_raw_import
 WHERE `case:concept:name` IS NOT NULL
   AND TRIM(`case:concept:name`) <> '';
 
+USE careflow;
+
+-- Check missing case IDs
+SELECT COUNT(*) AS missing_case_id_rows
+FROM sepsis_raw_import
+WHERE `case:concept:name` IS NULL
+   OR TRIM(`case:concept:name`) = '';
+
+-- Check cases containing Return ER
+SELECT
+    COUNT(DISTINCT CASE
+        WHEN TRIM(`concept:name`) = 'Return ER'
+        THEN TRIM(`case:concept:name`)
+    END) AS return_er_cases,
+    COUNT(DISTINCT NULLIF(TRIM(`case:concept:name`), ''))
+        AS valid_cases,
+    ROUND(
+        100.0 * COUNT(DISTINCT CASE
+            WHEN TRIM(`concept:name`) = 'Return ER'
+            THEN TRIM(`case:concept:name`)
+        END)
+        / NULLIF(
+            COUNT(DISTINCT NULLIF(TRIM(`case:concept:name`), '')),
+            0
+        ),
+        2
+    ) AS return_er_percentage
+FROM sepsis_raw_import;
 
 -- ============================================================
 -- END OF CAREFLOW SEPSIS EVENT LOG ANALYSIS

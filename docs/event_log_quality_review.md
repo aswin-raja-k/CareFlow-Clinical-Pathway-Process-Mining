@@ -1,0 +1,83 @@
+# Data Validation & Quality Report
+
+**Report date:** 15 October 2026  
+**Source file:** `Sepsis Cases - Event Log.csv`  
+**Scope:** Case IDs (`case:concept:name`), activity names (`concept:name`), event timestamps (`time:timestamp`), duplicate records, and within-case chronological order.  
+**Change control:** Diagnostic review only. The source CSV was not modified, and no records were deleted.
+
+## 1. Dataset overview
+
+- **Rows:** 15,214
+- **Columns:** 33 (including the exported row-index column `Unnamed: 0`)
+- **Distinct non-missing case IDs:** 1,049
+- **Timestamp range parsed as UTC:** 2013-11-07 08:18:29 to 2015-06-05 12:25:11
+
+## 2. Missing-value validation
+
+| Field | Missing values | Result |
+|---|---:|---|
+| Case ID (`case:concept:name`) | 24 | Issue found |
+| Activity name (`concept:name`) | 0 | Pass |
+| Timestamp (`time:timestamp`) | 0 | Pass |
+
+The 24 missing case IDs are a contiguous block at zero-based source index 441–464 (the 442nd–465th data records, excluding the header). The activity names and timestamps are present, but the records cannot be safely assigned to a case based on the case ID field alone.
+
+**Impact:** These events may be omitted from case-level summaries, sequence analysis, or process-mining results, and their correct case membership cannot be established from this column alone.
+
+**Recommended rule:** Treat a missing case ID as a blocking data-quality issue for case-level analysis. Check the original export/source system and obtain team-lead approval before assigning IDs. Do not infer IDs only from neighboring rows.
+
+## 3. Duplicate-record validation
+
+The exported `Unnamed: 0` column is a row/index field rather than event content. Comparing all 33 columns literally reports no duplicates because this index differs. Excluding that export index and comparing the remaining 32 data columns identifies **one duplicate full row (one repeated extra occurrence, two matching rows)**:
+
+- Zero-based source indices **7160 and 7161** (data records 7161 and 7162, excluding the header)
+- Case ID: `ES`
+- Activity: `Leucocytes`
+- Timestamp: `2014-11-08 05:50:00+00:00`
+- Leucocytes value: `12.6`
+- Other event fields match, including organization group `B` and lifecycle transition `complete`.
+
+The data also has **7 repeated `(case ID, activity name, timestamp)` combinations**, affecting 14 rows in total. These are not all full-row duplicates: several repeated event keys have differing event measurements or other fields. Repeated `(case ID, timestamp)` values are common in event logs and are not, by themselves, evidence of an error.
+
+**Impact:** Counting the confirmed duplicate full row as a separate measurement may double-count that event and affect summary statistics. Automatically removing all repeated event keys could instead erase legitimate same-time observations.
+
+**Recommended rule:** Flag exact duplicate event-content rows for review after excluding export-only index columns. Verify against the source record and team-lead approval before deduplication. Preserve repeated event keys when their content differs or when they represent valid observations.
+
+## 4. Timestamp validation and randomized timestamps
+
+- Missing timestamps: **0**
+- Non-empty timestamps that failed parsing: **0**
+- Parsed timestamps: all 15,214 values parsed successfully as timezone-aware UTC timestamps.
+- Observed timestamp range: **2013-11-07 08:18:29+00:00** to **2015-06-05 12:25:11+00:00**.
+
+**Timestamp caveat:** The task context states that timestamps were randomized. Therefore, successful parsing confirms only their syntactic validity; it does **not** establish that the timestamp values reflect actual clinical/event times or preserve real-world timing intervals. Chronology and duration-based conclusions should be treated as limited unless the timestamp randomization process and its effect on event order are documented.
+
+**Impact:** Randomized timestamps can undermine time-to-event calculations, interval/duration analysis, and interpretations of real-world event timing. If randomization changed event order, sequence conclusions based on timestamps may also be unreliable.
+
+**Recommended rule:** Keep the supplied timestamp values unchanged in the source dataset. Document the randomization caveat and, if true event timing is needed, request the authoritative timestamps or a documented transformation from the data owner. Do not attempt to reverse randomization by guessing.
+
+## 5. Chronological event-order check
+
+Using the current CSV row order, parseable timestamps were compared with the preceding timestamp within each non-missing case ID:
+
+- Backward timestamp transitions found: **0**
+- Cases with a backward transition found: **0**
+- Rows with missing case IDs excluded from case-specific ordering checks: **24**
+
+No timestamp regressions were found in the available case-grouped source-row sequence. This result must be interpreted with the randomized-timestamp caveat above: it is a check of the supplied file, not proof of the true clinical chronology. Events sharing the same timestamp are allowed by this check and do not count as backward transitions.
+
+**Recommended rule:** Re-run chronology checks after any approved case-ID resolution. Keep the original row order and timestamps available for audit, and separately record any approved ordering or timestamp corrections. Do not reorder or alter the original CSV as part of this report task.
+
+## 6. Recommended cleaning and governance rules
+
+1. **Missing case IDs:** Investigate all 24 records against an authoritative source. Assign IDs only with evidence and approval; otherwise retain them as unresolved and exclude them from case-specific calculations with the exclusion documented.
+2. **Exact duplicate row:** Flag the matching rows at source indices 7160 and 7161. Confirm whether one is an accidental duplicate before any removal; do not delete at this stage.
+3. **Repeated event keys:** Review the 7 repeated `(case ID, activity, timestamp)` combinations. Do not treat a repeated key alone as a duplicate.
+4. **Timestamps:** Validate format and timezone consistently; preserve raw values. Explicitly disclose that timestamps were randomized and avoid claims about true durations or chronology unless supported by source documentation.
+5. **Audit trail:** For every approved future correction, record the row identifier, original value, proposed value, rationale, approver, and date in a separate change log.
+6. **Approval gate:** Do not modify the original CSV or delete records without team-lead approval. Make approved cleaning changes to a separate derived copy, not the source file.
+7. **Revalidation:** After approved changes, rerun missing-value, duplicate, timestamp parsing, and per-case ordering checks and compare results with this baseline.
+
+## 7. Summary
+
+The checks found **24 missing case IDs**, no missing activity names or timestamps, no timestamp parse failures, and **one exact duplicate full row when the export-only row index is excluded**. Seven repeated case/activity/timestamp combinations require contextual review rather than automatic removal. No backward timestamp transitions were found in the available per-case source-row sequence, but timestamps were randomized, so this does not validate real-world chronology. The report is diagnostic only: the original CSV remains unchanged and no records have been deleted.

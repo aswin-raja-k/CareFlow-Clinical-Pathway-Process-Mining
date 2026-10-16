@@ -195,17 +195,23 @@ The dataset source and DOI should be retained in the project documentation so th
 
 ## 8. Usage and Redistribution Terms
 
-The official dataset record indicates usage under the **4TU General Terms of Use**.
+The dataset is provided under the **4TU General Terms of Use**.
 
-The redistribution permission for the raw dataset has **not been separately confirmed** for this project.
+According to Section 4, part or all of the dataset may be distributed to third parties, provided that the source and rights-holder/Creator are acknowledged. Any subsequent distribution must also include the source acknowledgement.
 
-Therefore:
+The data may be remixed, transformed, or used to build upon for **non-commercial purposes only**.
 
-- The raw Sepsis CSV should **not be uploaded to the public GitHub repository** until redistribution terms have been checked.
-- The project may keep the data dictionary, source citation, verification results, and analysis documentation in GitHub.
-- The official source and DOI should be cited whenever the dataset is referenced.
+For this project:
 
----
+- Source acknowledgement must be included.
+- The original creator/rights-holder must be credited.
+- The DOI and official dataset record should be provided.
+- The dataset must not be used for commercial purposes.
+- Any subsequent redistribution should retain the required acknowledgement.
+
+**Redistribution status:** Permitted under the 4TU General Terms of Use, subject to the above conditions.
+
+**Official terms:** 4TU General Terms of Use, August 2016.
 
 ## 9. Dataset Selection Rationale
 

@@ -93,3 +93,42 @@ These are review actions, not claims that all teammates' deliverables have alrea
 - Do not merge into `main` before team review and approval.
 
 **Deliverable:** Initial process-discovery review, proposed preparation rules, team review checklist, blockers and integration plan.
+
+## 8. Follow-up Review — 21 October 2026
+
+### Output verification
+
+The generated process-discovery summary and required output files were checked.
+
+- **Source rows:** 15,214
+- **Rows with missing case IDs:** 24
+- **Rows with missing activity names:** 0
+- **Rows with missing or invalid timestamps:** 0
+- **Usable rows before deduplication:** 15,190
+- **Duplicate model-field rows removed:** 7
+- **Events in the prepared working log:** 15,183
+- **Cases in the working log:** 1,049
+- **Activities in the working log:** 16
+
+### Generated artifacts
+
+- `outputs/sepsis_process_tree.png` — confirmed to exist.
+- `outputs/prepared_sepsis_event_log.csv` — confirmed to exist.
+- `reports/sepsis_process_discovery_summary.txt` — reviewed.
+
+The summary identifies the Inductive Miner process tree as the discovery method and records the preparation limitations.
+
+### Review outcome
+
+The summary counts are consistent with the previously recorded validation figures. The visualization's existence was verified, but detailed interpretation of its branches remains pending.
+
+The prepared log is a derived working copy. The original dataset remains unchanged and must not be committed to GitHub.
+
+### Outstanding actions
+
+1. Review the process-tree branches and activity paths.
+2. Obtain team agreement on event-log preparation and deduplication rules.
+3. Verify the teammates' data-quality and SQL results.
+4. Complete team review before planning any integration into `main`.
+
+**Status:** Output existence and summary review completed; visual interpretation and team approval remain pending.

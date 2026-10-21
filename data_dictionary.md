@@ -169,28 +169,35 @@ However, the timestamp randomization must be clearly documented when interpretin
 
 ---
 
-## 7. Dataset Source
+## 7. Source, Citation and Redistribution Verification
 
-**Author:** Felix Mannhardt
+**Dataset:** Sepsis Cases - Event Log  
+**Creator:** Felix Mannhardt  
+**Publisher:** 4TU.ResearchData  
+**Version:** 1  
+**DOI:** 10.4121/uuid:915d2bfb-7e84-49ad-a286-dc35f063a460  
+**Official Source:** https://data.4tu.nl/articles/_/12707639/1
 
-**Year:** 2016
+### Citation
 
-**Dataset:** *Sepsis Cases – Event Log*
+Mannhardt, Felix (2016): *Sepsis Cases - Event Log*. Version 1. 4TU.ResearchData. Dataset. https://doi.org/10.4121/uuid:915d2bfb-7e84-49ad-a286-dc35f063a460
 
-**Version:** Version 1
+### Usage Terms
 
-**Repository:** 4TU.ResearchData, Eindhoven University of Technology
+The official 4TU.ResearchData page lists the dataset licence as **4TU General Terms of Use**.
 
-**DOI:**
+### Redistribution Status
 
-`10.4121/uuid:915d2bfb-7e84-49ad-a286-dc35f063a460`
+The official source and usage terms were reviewed. The dataset is **not treated as having a separate open redistribution licence such as CC-BY**. Therefore, the raw CSV should not be redistributed through this project until the applicable 4TU terms have been confirmed for redistribution.
 
-**Official dataset record:**
+For the CareFlow repository, the dataset documentation records the official source, DOI, citation and usage terms. The raw dataset should remain outside the public repository unless redistribution is confirmed to be permitted.
 
-`https://data.4tu.nl/articles/_/12707639/1`
+### Verification Evidence
 
-The dataset source and DOI should be retained in the project documentation so that the dataset can be properly identified and cited.
-
+- Official dataset source and DOI verified.
+- Dataset licence verified as **4TU General Terms of Use**.
+- CSV schema documented against the available dataset.
+- No dataset rows were modified or removed during verification.
 ---
 
 ## 8. Usage and Redistribution Terms

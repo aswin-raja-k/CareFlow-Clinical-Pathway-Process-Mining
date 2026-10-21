@@ -14,6 +14,58 @@
 
 USE careflow;
 
+-- ============================================================
+-- TODAY'S TASK: EXPECTED COUNT VALIDATION
+-- Compare actual dataset counts with expected values.
+-- ============================================================
+
+SELECT
+    source_rows,
+    destination_rows,
+    unique_cases,
+    distinct_activities,
+    missing_case_ids,
+    missing_timestamps,
+    CASE
+        WHEN source_rows = 15214
+         AND destination_rows = 15214
+         AND unique_cases = 1050
+         AND distinct_activities = 16
+         AND missing_case_ids = 0
+         AND missing_timestamps = 0
+        THEN 'PASS'
+        ELSE 'REVIEW REQUIRED'
+    END AS validation_status
+FROM (
+    SELECT
+        (SELECT COUNT(*)
+         FROM sepsis_raw_import) AS source_rows,
+
+        (SELECT COUNT(*)
+         FROM sepsis_event_log) AS destination_rows,
+
+        (SELECT COUNT(DISTINCT NULLIF(
+            TRIM(`case:concept:name`), ''
+         ))
+         FROM sepsis_event_log) AS unique_cases,
+
+        (SELECT COUNT(DISTINCT NULLIF(
+            TRIM(`concept:name`), ''
+         ))
+         FROM sepsis_event_log) AS distinct_activities,
+
+        (SELECT COUNT(*)
+         FROM sepsis_event_log
+         WHERE `case:concept:name` IS NULL
+            OR TRIM(`case:concept:name`) = ''
+        ) AS missing_case_ids,
+
+        (SELECT COUNT(*)
+         FROM sepsis_event_log
+         WHERE `time:timestamp` IS NULL
+        ) AS missing_timestamps
+) AS validation;
+
 
 -- ============================================================
 -- 1. DATASET OVERVIEW
@@ -242,7 +294,11 @@ WITH ordered_events AS (
         `time:timestamp` AS event_time,
         LAG(`time:timestamp`) OVER (
             PARTITION BY `case:concept:name`
-            ORDER BY `time:timestamp`, event_id
+            ORDER BY
+                `time:timestamp`,
+                `concept:name`,
+                `lifecycle:transition`,
+                `org:group`
         ) AS previous_event_time
     FROM sepsis_event_log
     WHERE `case:concept:name` IS NOT NULL

@@ -188,9 +188,9 @@ The official 4TU.ResearchData page lists the dataset licence as **4TU General Te
 
 ### Redistribution Status
 
-The official source and usage terms were reviewed. The dataset is **not treated as having a separate open redistribution licence such as CC-BY**. Therefore, the raw CSV should not be redistributed through this project until the applicable 4TU terms have been confirmed for redistribution.
+The dataset is provided under the **4TU General Terms of Use**. Redistribution is permitted subject to the conditions specified in those terms, including appropriate source and creator acknowledgement and the applicable non-commercial-use requirements.
 
-For the CareFlow repository, the dataset documentation records the official source, DOI, citation and usage terms. The raw dataset should remain outside the public repository unless redistribution is confirmed to be permitted.
+For this project, the original source, creator, DOI, and applicable usage conditions are documented below in Section 8.
 
 ### Verification Evidence
 

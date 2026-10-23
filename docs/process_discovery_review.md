@@ -132,3 +132,19 @@ The prepared log is a derived working copy. The original dataset remains unchang
 4. Complete team review before planning any integration into `main`.
 
 **Status:** Output existence and summary review completed; visual interpretation and team approval remain pending.
+
+## 9. Visual Process-Tree Review — 23 October 2026
+
+### Initial structural observations
+
+The generated Inductive Miner process tree contains sequential (`seq`), parallel (`and`), exclusive-choice (`xor`), and loop (`xor loop`) operators.
+
+Visible activities include ER Registration, Admission NC, ER Triage, ER Sepsis Triage, IV Antibiotics, IV Liquid, Leucocytes, CRP, LacticAcid, Return ER, and release activities.
+
+### Interpretation limitations
+
+These observations describe the structure of the discovered model only. They do not establish actual clinical decisions, causes of repeated activities, or confirmed hospital bottlenecks.
+
+Further validation is required against the prepared event log and team-agreed event-log preparation rules.
+
+**Status:** Initial visual inspection completed; detailed path validation and team review remain pending.

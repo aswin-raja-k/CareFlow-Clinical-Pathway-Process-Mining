@@ -206,8 +206,7 @@ The dataset is provided under the **4TU General Terms of Use**.
 
 According to Section 4, part or all of the dataset may be distributed to third parties, provided that the source and rights-holder/Creator are acknowledged. Any subsequent distribution must also include the source acknowledgement.
 
-The data may be remixed, transformed, or used to build upon for **non-commercial purposes only**.
-
+"Redistribution status: Permitted under the 4TU General Terms of Use".
 For this project:
 
 - Source acknowledgement must be included.
@@ -261,14 +260,23 @@ The randomized timestamp limitation must be considered when interpreting time-re
 | Usage terms | 4TU General Terms of Use |
 | Raw dataset for GitHub | Do not upload until redistribution terms are confirmed |
 
----
-
+--
 ## 11. Verification Status
 
-This data dictionary was verified against the actual `Sepsis Cases - Event Log.csv` file.
+The `Sepsis Cases - Event Log.csv` schema was verified against the 32 substantive fields documented in this data dictionary.
 
-The verification confirms that the documented process-mining fields and overall CSV structure match the inspected file.
+### Verification Evidence
 
-The technical `Unnamed: 0` column is documented separately and is not treated as a substantive clinical/process field.
+- 32 substantive dataset fields were checked against the documented column names.
+- The technical `Unnamed: 0` column is documented separately and is not treated as a substantive dataset field.
+- The three core process-mining fields were verified:
+  - `case:concept:name`
+  - `concept:name`
+  - `time:timestamp`
+- Dataset source, author, year, version and DOI were verified against the 4TU.ResearchData information.
+- The dataset is licensed under the 4TU General Terms of Use.
+- Redistribution is subject to the conditions specified by those terms, including appropriate source/creator acknowledgement and applicable non-commercial requirements.
+- The timestamp randomization limitation remains documented.
+- No dataset rows or original values were modified as part of this documentation verification.
 
-**Verification date:** 15 October 2026
+**Verification date:** 23 October 2026

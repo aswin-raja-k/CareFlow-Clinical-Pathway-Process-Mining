@@ -14,24 +14,23 @@
 
 USE careflow;
 
--- ============================================================
--- TODAY'S TASK: EXPECTED COUNT VALIDATION
--- Compare actual dataset counts with expected values.
--- ============================================================
+
+-- EXPECTED COUNT VALIDATION
+-- Treat placeholder case IDs as invalid.
 
 SELECT
     source_rows,
     destination_rows,
-    unique_cases,
+    valid_cases,
     distinct_activities,
-    missing_case_ids,
+    invalid_case_id_rows,
     missing_timestamps,
     CASE
         WHEN source_rows = 15214
          AND destination_rows = 15214
-         AND unique_cases = 1050
+         AND valid_cases = 1049
          AND distinct_activities = 16
-         AND missing_case_ids = 0
+         AND invalid_case_id_rows = 24
          AND missing_timestamps = 0
         THEN 'PASS'
         ELSE 'REVIEW REQUIRED'
@@ -44,27 +43,34 @@ FROM (
         (SELECT COUNT(*)
          FROM sepsis_event_log) AS destination_rows,
 
-        (SELECT COUNT(DISTINCT NULLIF(
-            TRIM(`case:concept:name`), ''
-         ))
-         FROM sepsis_event_log) AS unique_cases,
+        (SELECT COUNT(DISTINCT TRIM(`case:concept:name`))
+         FROM sepsis_event_log
+         WHERE `case:concept:name` IS NOT NULL
+           AND TRIM(`case:concept:name`) <> ''
+           AND UPPER(TRIM(`case:concept:name`))
+               NOT IN ('NA', 'N/A', 'NAN', 'NULL', 'NONE')
+        ) AS valid_cases,
 
-        (SELECT COUNT(DISTINCT NULLIF(
-            TRIM(`concept:name`), ''
-         ))
-         FROM sepsis_event_log) AS distinct_activities,
+        (SELECT COUNT(DISTINCT TRIM(`concept:name`))
+         FROM sepsis_event_log
+         WHERE `concept:name` IS NOT NULL
+           AND TRIM(`concept:name`) <> ''
+        ) AS distinct_activities,
 
         (SELECT COUNT(*)
          FROM sepsis_event_log
          WHERE `case:concept:name` IS NULL
             OR TRIM(`case:concept:name`) = ''
-        ) AS missing_case_ids,
+            OR UPPER(TRIM(`case:concept:name`))
+               IN ('NA', 'N/A', 'NAN', 'NULL', 'NONE')
+        ) AS invalid_case_id_rows,
 
         (SELECT COUNT(*)
          FROM sepsis_event_log
          WHERE `time:timestamp` IS NULL
         ) AS missing_timestamps
 ) AS validation;
+
 
 
 -- ============================================================
@@ -327,41 +333,36 @@ WHERE previous_event_time IS NOT NULL;
 -- ============================================================
 
 
-WITH activity_repeats AS (
-    SELECT
-        `case:concept:name` AS case_id,
-        `concept:name` AS activity_name,
-        COUNT(*) AS activity_count
+
+WITH repeated_cases AS (
+    SELECT TRIM(`case:concept:name`) AS case_id
     FROM sepsis_event_log
     WHERE `case:concept:name` IS NOT NULL
       AND TRIM(`case:concept:name`) <> ''
+      AND UPPER(TRIM(`case:concept:name`))
+          NOT IN ('NA', 'N/A', 'NAN', 'NULL', 'NONE')
       AND `concept:name` IS NOT NULL
       AND TRIM(`concept:name`) <> ''
     GROUP BY
-        `case:concept:name`,
-        `concept:name`
-),
-case_repeat_flags AS (
-    SELECT
-        case_id,
-        MAX(
-            CASE
-                WHEN activity_count > 1 THEN 1
-                ELSE 0
-            END
-        ) AS has_repeated_activity
-    FROM activity_repeats
-    GROUP BY case_id
+        TRIM(`case:concept:name`),
+        TRIM(`concept:name`)
+    HAVING COUNT(*) > 1
 )
 SELECT
-    SUM(has_repeated_activity) AS repeated_activity_cases,
-    COUNT(*) AS total_cases,
+    COUNT(DISTINCT case_id) AS repeated_activity_cases,
+    (SELECT COUNT(DISTINCT TRIM(`case:concept:name`))
+     FROM sepsis_event_log
+     WHERE `case:concept:name` IS NOT NULL
+       AND TRIM(`case:concept:name`) <> ''
+       AND UPPER(TRIM(`case:concept:name`))
+           NOT IN ('NA', 'N/A', 'NAN', 'NULL', 'NONE')
+    ) AS total_valid_cases,
     ROUND(
-        100.0 * SUM(has_repeated_activity)
-        / NULLIF(COUNT(*), 0),
-        5
-    ) AS pct_cases_with_repeated_activities
-FROM case_repeat_flags;
+        100.0 * COUNT(DISTINCT case_id) / 1049,
+        2
+    ) AS repeated_activity_percentage
+FROM repeated_cases;
+
 
 
 -- ============================================================
@@ -371,36 +372,55 @@ FROM case_repeat_flags;
 -- ============================================================
 
 
-SELECT
-    COUNT(
-        DISTINCT CASE
-            WHEN TRIM(`concept:name`) = 'Return ER'
-            THEN TRIM(`case:concept:name`)
-        END
-    ) AS cases_with_return_er,
+-- KPI 5: Valid cases containing Return ER
 
-    COUNT(
-        DISTINCT NULLIF(TRIM(`case:concept:name`), '')
-    ) AS total_cases,
+SELECT
+    COUNT(DISTINCT CASE
+        WHEN LOWER(TRIM(`concept:name`)) = 'return er'
+        THEN TRIM(`case:concept:name`)
+    END) AS return_er_cases,
+
+    COUNT(DISTINCT TRIM(`case:concept:name`))
+        AS total_valid_cases,
 
     ROUND(
-        100.0 * COUNT(
-            DISTINCT CASE
-                WHEN TRIM(`concept:name`) = 'Return ER'
-                THEN TRIM(`case:concept:name`)
-            END
-        )
-        / NULLIF(
-            COUNT(
-                DISTINCT NULLIF(TRIM(`case:concept:name`), '')
-            ),
-            0
-        ),
-        5
+        100.0 * COUNT(DISTINCT CASE
+            WHEN LOWER(TRIM(`concept:name`)) = 'return er'
+            THEN TRIM(`case:concept:name`)
+        END) /
+        NULLIF(COUNT(DISTINCT TRIM(`case:concept:name`)), 0),
+        2
     ) AS pct_cases_with_return_er
+
+FROM sepsis_event_log
+WHERE `case:concept:name` IS NOT NULL
+  AND TRIM(`case:concept:name`) <> ''
+  AND UPPER(TRIM(`case:concept:name`))
+      NOT IN ('NA', 'N/A', 'NAN', 'NULL', 'NONE');
+
+
+
+
+
+
+SELECT
+    COUNT(*) AS total_events,
+    COUNT(DISTINCT CASE
+        WHEN `case:concept:name` IS NOT NULL
+         AND TRIM(`case:concept:name`) <> ''
+         AND UPPER(TRIM(`case:concept:name`))
+             NOT IN ('NA', 'N/A', 'NAN', 'NULL', 'NONE')
+        THEN TRIM(`case:concept:name`)
+    END) AS valid_cases,
+    COUNT(DISTINCT NULLIF(TRIM(`concept:name`), ''))
+        AS distinct_activities,
+    SUM(
+        `case:concept:name` IS NULL
+        OR TRIM(`case:concept:name`) = ''
+        OR UPPER(TRIM(`case:concept:name`))
+           IN ('NA', 'N/A', 'NAN', 'NULL', 'NONE')
+    ) AS invalid_case_id_rows
 FROM sepsis_event_log;
-
-
 
 
 -- ============================================================
@@ -409,17 +429,18 @@ FROM sepsis_event_log;
 -- Source rows: 15214
 -- Destination rows: 15214
 -- Row difference: 0
--- Unique cases: 1050
--- Distinct activities: 16
--- Missing case IDs: 0
--- Missing timestamps: 0
--- Unparseable source timestamps: 0
--- Source timestamps include the +00:00 UTC offset.
--- Destination DATETIME values retain the date/time portion
--- and are interpreted as UTC.
--- Clinical measurement columns contain missing values.
--- Duplicate groups must be checked against the raw source.
--- No duplicate records were deleted.
+-- Invalid case-ID rows: 24 (case ID recorded as NA)
+-- Valid cases: 1049
+-- Valid events after excluding invalid case IDs: 15190
+-- Distinct activities: 16 (verify with validation query)
+-- Missing timestamps: 0 (verify with validation query)
+-- Duplicate groups in selected event columns: 1
+-- Extra duplicate rows in selected event columns: 1
+-- Duplicate group requires full-row source verification.
+-- No records were deleted.
+-- Timestamp format and timezone handling must be verified.
+-- Repeated activities may indicate rework but do not prove error.
 -- ============================================================
+
 
 -- END OF CAREFLOW SEPSIS EVENT LOG ANALYSIS

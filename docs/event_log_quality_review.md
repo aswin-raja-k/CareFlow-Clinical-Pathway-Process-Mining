@@ -85,38 +85,43 @@ The checks found **24 missing case IDs**, no missing activity names or timestamp
 
 ## 8. Cross-Report Reconciliation and Revalidation
 
-**Review date:** 23 October 2026
+**Review date:** 24 October 2026
 
-The reports `data_quality_report.md` and `event_log_quality_review.md` were compared. Their contents were identical at the time of review, and no conflicting validation counts were found.
-
-The findings were rechecked against the uploaded copy of `Sepsis Cases - Event Log.csv`.
+The reports `data_quality_report.md` and `event_log_quality_review.md` were compared. Their findings were reviewed against the uploaded CSV and the available output from `sepsis_analysis.sql`.
 
 ### Verified Results
 
-- Total rows: 15,214
-- Total columns: 33, including the exported `Unnamed: 0` index column
-- Distinct non-missing case IDs: 1,049
-- Missing case IDs: 24
+- Total source rows: 15,214
+- Total destination rows reported by SQL: 15,214
+- Total columns in the CSV: 33, including the exported `Unnamed: 0` index column
+- Distinct nonblank case IDs: 1,049
+- Rows with missing or blank case IDs: 24
 - Missing activity names: 0
 - Missing timestamps: 0
 - Non-empty timestamps that failed parsing: 0
-- Exact duplicate rows across all 33 columns: 0
-- One repeated full-row occurrence when the exported index column is excluded
-- Repeated case/activity/timestamp combinations: 7, affecting 14 rows
+- Exact duplicate rows across all 33 columns, including the exported index: 0
+- Duplicate occurrence after excluding the exported index column: 1, consisting of two matching rows
+- Repeated case/activity/timestamp combinations: 7 groups affecting 14 rows
 - Backward timestamp transitions in source-row order within non-missing cases: 0
+
+### Reconciliation Notes
+
+The displayed SQL results support 24 missing or invalid case IDs and 1,049 distinct nonblank case IDs. An earlier SQL summary reported zero missing case IDs and 1,050 unique cases; that summary conflicts with the displayed validation results and should not be treated as the final result.
+
+Duplicate checks depend on the columns being compared. Repeated case/activity/timestamp combinations do not necessarily mean the complete event records are duplicates. The duplicate counts above are based on the CSV review and should be interpreted according to each check's definition.
 
 ### Interpretation and Limitations
 
-The validation counts are consistent with the existing report. Repeated case/activity/timestamp combinations are not necessarily duplicate full records and should not be removed automatically.
+The source and destination row counts match at 15,214 rows according to the SQL output. However, matching row counts do not mean that all data-quality issues are absent.
 
-The task context states that timestamps were randomized. Successful timestamp parsing does not prove that the values represent actual clinical times or preserve real-world event order and durations.
+The timestamps were reported as randomized. Therefore, the absence of backward timestamp transitions in source-row order does not establish that the events reflect actual clinical chronology.
 
-### Data Protection and Recommendations
+### Recommended Actions
 
-- The original CSV was used for validation only and was not added to the repository.
-- No source records were modified or deleted.
-- Investigate missing case IDs and review the duplicate occurrence before making any changes.
-- Obtain team-lead approval before modifying or deleting records.
-- Repeat the validation checks after any approved corrections.
+1. Investigate the 24 rows with missing or blank case IDs.
+2. Review duplicate records and repeated event combinations before proposing any changes.
+3. Do not invent missing case IDs or delete records without supporting evidence and team-lead approval.
+4. Preserve the original CSV and document any approved cleaning decisions.
+5. Recheck the complete SQL duplicate-query output if the SQL and CSV duplicate counts differ.
 
-**Conclusion:** The reports contain consistent validation counts. The findings remain diagnostic, and conclusions about actual event chronology are limited by the timestamp-randomization caveat.
+**Change control:** This review is diagnostic only. The original CSV was not modified, and no records were deleted.

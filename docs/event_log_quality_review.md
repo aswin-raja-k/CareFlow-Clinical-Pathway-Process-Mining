@@ -125,3 +125,32 @@ The timestamps were reported as randomized. Therefore, the absence of backward t
 5. Recheck the complete SQL duplicate-query output if the SQL and CSV duplicate counts differ.
 
 **Change control:** This review is diagnostic only. The original CSV was not modified, and no records were deleted.
+
+
+
+Date:-  26/10/2026
+
+
+## 9. SQL and Quality Report Cross-Check
+
+### 9.1 Missing Case IDs and Distinct Cases
+
+The CSV quality review identified 24 rows with missing case IDs and 1,049 distinct nonblank case IDs.
+
+The existing SQL validation summary reports 0 missing case IDs and 1,050 unique cases. These results do not agree with the CSV review. The discrepancy remains unresolved because the actual SQL database results have not been independently verified against the same source CSV.
+
+### 9.2 Duplicate Validation
+
+The CSV review identified:
+
+- Exact duplicate rows across all 33 columns, including the exported `Unnamed: 0` index column: 0.
+- One repeated full-row occurrence when the exported index column is excluded.
+- Seven repeated case/activity/timestamp combinations, affecting 14 rows.
+
+These measures use different definitions. Repeated case/activity/timestamp combinations do not necessarily represent duplicate full records. The SQL summary available for this review does not clearly provide matching duplicate counts, so agreement with SQL cannot yet be confirmed.
+
+### 9.3 Conclusion and Follow-up
+
+The CSV quality findings are documented, but reconciliation with SQL remains pending. The raw CSV has not been modified, and no records have been deleted.
+
+The team should verify the source and destination tables, missing case IDs, distinct case counts, and duplicate queries using the same dataset before marking the discrepancy as resolved.

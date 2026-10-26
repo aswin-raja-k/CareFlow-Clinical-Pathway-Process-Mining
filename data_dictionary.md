@@ -171,13 +171,12 @@ However, the timestamp randomization must be clearly documented when interpretin
 
 ## 7. Source, Citation and Redistribution Verification
 
-**Dataset:** Sepsis Cases - Event Log  
-**Creator:** Felix Mannhardt  
-**Publisher:** 4TU.ResearchData  
-**Version:** 1  
-**DOI:** 10.4121/uuid:915d2bfb-7e84-49ad-a286-dc35f063a460  
-**Official Source:** https://data.4tu.nl/articles/_/12707639/1
-
+Dataset: Sepsis Cases - Event Log
+Creator: Felix Mannhardt
+Publisher: 4TU.ResearchData
+Version: 1
+DOI: 10.4121/uuid:915d2bfb-7e84-49ad-a286-dc35f063a460
+Licence: 4TU General Terms of Use
 ### Citation
 
 Mannhardt, Felix (2016): *Sepsis Cases - Event Log*. Version 1. 4TU.ResearchData. Dataset. https://doi.org/10.4121/uuid:915d2bfb-7e84-49ad-a286-dc35f063a460
@@ -191,7 +190,7 @@ The official 4TU.ResearchData page lists the dataset licence as **4TU General Te
 The dataset is provided under the **4TU General Terms of Use**. Redistribution is permitted subject to the conditions specified in those terms, including appropriate source and creator acknowledgement and the applicable non-commercial-use requirements.
 
 For this project, the original source, creator, DOI, and applicable usage conditions are documented below in Section 8.
-
+Redistribution status: Permitted under the 4TU General Terms of Use
 ### Verification Evidence
 
 - Official dataset source and DOI verified.

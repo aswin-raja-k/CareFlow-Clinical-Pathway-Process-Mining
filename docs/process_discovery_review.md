@@ -148,3 +148,39 @@ These observations describe the structure of the discovered model only. They do 
 Further validation is required against the prepared event log and team-agreed event-log preparation rules.
 
 **Status:** Initial visual inspection completed; detailed path validation and team review remain pending.
+
+## 10. Team Validation and Integration Checklist — 26 October 2026
+
+### Validation baseline
+
+The initial Python validation recorded:
+
+- Source rows: 15,214
+- Rows with missing case IDs: 24
+- Usable rows before deduplication: 15,190
+- Duplicate model-field rows removed: 7
+- Events in the prepared working log: 15,183
+- Cases in the working log: 1,049
+- Activities in the working log: 16
+
+These are Python validation and process-discovery figures. SQL results must be independently verified before declaring the analyses reconciled.
+
+### Team review requirements
+
+- **Dataset documentation:** Verify the documented fields against the actual CSV headers and confirm the source and redistribution terms.
+- **SQL analysis:** Verify actual MySQL query outputs, duplicate definitions, and all five KPIs against the documented validation rules.
+- **Data quality:** Reconcile exact duplicate rows with repeated case/activity/timestamp combinations and document any remaining SQL discrepancies.
+- **Process mining:** Review the discovered process-tree paths and confirm the event-log preparation rules with the team.
+
+### Integration safeguards
+
+1. Keep each teammate's work on their assigned branch until reviewed.
+2. Do not commit the raw source CSV or the local prepared CSV.
+3. Do not merge into `main` until documentation, SQL results, and data-quality findings have been reviewed.
+4. Record unresolved discrepancies explicitly rather than treating them as verified results.
+
+### Current status
+
+The initial process-discovery output and visual structure have been documented. Team verification of SQL outputs, dataset documentation, data-quality findings, and preparation rules remains necessary before integration.
+
+**Status:** Integration pending team validation and review.

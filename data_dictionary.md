@@ -197,7 +197,6 @@ The dataset is provided under the **4TU General Terms of Use**.
 
 According to Section 4, part or all of the dataset may be distributed to third parties, provided that the source and rights-holder/Creator are acknowledged. Any subsequent distribution must also include the source acknowledgement.
 
-"Redistribution status: Permitted under the 4TU General Terms of Use".
 For this project:
 
 - Source acknowledgement must be included.
@@ -250,10 +249,6 @@ The randomized timestamp limitation must be considered when interpreting time-re
 | Raw dataset for GitHub | Permitted under the 4TU General Terms of Use, subject to the stated conditions |
 
 --
-## 11. Verification Status
-
-The `Sepsis Cases - Event Log.csv` schema was verified against the 32 substantive fields documented in this data dictionary.
-
 ## 11. Verification Status
 
 The `Sepsis Cases - Event Log.csv` schema was verified against the 32 substantive fields documented in this data dictionary.

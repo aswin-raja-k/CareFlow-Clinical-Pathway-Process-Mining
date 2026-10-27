@@ -282,7 +282,9 @@ FROM (
 -- Formula: last event timestamp - first event timestamp.
 -- The source timestamp may include a timezone suffix (+00:00),
 -- so the first 19 characters are parsed as a MySQL DATETIME.
+-- Excludes NULL, blank, and placeholder case IDs.
 -- ============================================================
+
 
 SELECT
     ROUND(AVG(duration_minutes), 5)
@@ -297,7 +299,8 @@ FROM (
         ) / 60.0 AS duration_minutes
     FROM sepsis_event_log
     WHERE `case:concept:name` IS NOT NULL
-      AND TRIM(`case:concept:name`) <> ''
+      AND UPPER(TRIM(`case:concept:name`))
+          NOT IN ('', 'NA', 'N/A', 'NAN', 'NULL', 'NONE')
       AND `time:timestamp` IS NOT NULL
     GROUP BY `case:concept:name`
 ) AS case_durations;
@@ -306,9 +309,9 @@ FROM (
 -- ============================================================
 -- KPI 3. AVERAGE TIME BETWEEN CONSECUTIVE EVENTS
 -- Uses LAG() to compare each event with the preceding event
--- within the same case. Requires MySQL 8.0 or later.
+-- within the same valid case. Requires MySQL 8.0 or later.
+-- Excludes NULL, blank, and placeholder case IDs.
 -- ============================================================
-
 
 WITH ordered_events AS (
     SELECT
@@ -324,7 +327,8 @@ WITH ordered_events AS (
         ) AS previous_event_time
     FROM sepsis_event_log
     WHERE `case:concept:name` IS NOT NULL
-      AND TRIM(`case:concept:name`) <> ''
+      AND UPPER(TRIM(`case:concept:name`))
+          NOT IN ('', 'NA', 'N/A', 'NAN', 'NULL', 'NONE')
       AND `time:timestamp` IS NOT NULL
 )
 SELECT

@@ -154,3 +154,63 @@ These measures use different definitions. Repeated case/activity/timestamp combi
 The CSV quality findings are documented, but reconciliation with SQL remains pending. The raw CSV has not been modified, and no records have been deleted.
 
 The team should verify the source and destination tables, missing case IDs, distinct case counts, and duplicate queries using the same dataset before marking the discrepancy as resolved.
+
+
+
+
+## 10. Data Quality and SQL Reconciliation — 27 October 2026
+
+### 10.1 Missing Case IDs and Distinct Cases
+
+The MySQL Workbench validation query returned the following results for both `sepsis_raw_import` and `sepsis_event_log`:
+
+| Metric | `sepsis_raw_import` | `sepsis_event_log` |
+|---|---:|---:|
+| Total rows | 15,214 | 15,214 |
+| Missing or invalid case ID rows | 24 | 24 |
+| Distinct valid case IDs | 1,049 | 1,049 |
+
+The earlier result reporting zero missing case IDs used a different validation condition. The validation that checks NULL, blank, and configured placeholder values returned 24 invalid case-ID rows in both tables. Therefore, the zero result should not be used as the final missing-ID count.
+
+### 10.2 Repeated Case/Activity/Timestamp Combinations
+
+The SQL result reported:
+
+- Repeated key groups: 7
+- Rows belonging to those groups: 14
+- Extra occurrences beyond one row per group: 7
+
+These are repeated combinations of case ID, activity name, and timestamp. They are not automatically exact duplicate full rows.
+
+### 10.3 Exact Full-Row Duplicates
+
+The separate SQL duplicate check returned zero duplicate groups, zero rows in duplicate groups, and zero extra occurrences under the columns included in that check.
+
+The CSV review found one repeated row when the exported `Unnamed: 0` index column was excluded from comparison, but zero exact duplicates when all 33 columns, including that index, were compared. This difference is consistent with the index column distinguishing otherwise identical records. The duplicate result must therefore be reported with its comparison method.
+
+### 10.4 SQL Reconciliation and Limitations
+
+The displayed SQL results show that the raw-import and event-log tables have matching row counts and matching case-ID validation counts. They do not, by themselves, prove that every field in both tables is identical.
+
+The earlier SQL summary reporting zero missing IDs and 1,050 unique cases conflicts with the validation output shown on 27 October 2026. The displayed results from the current validation are 24 missing or invalid case-ID rows and 1,049 distinct valid case IDs in each table. The previous summary should be corrected or labelled as superseded after its query logic is reviewed.
+
+### 10.5 Evidence and Data Handling
+
+MySQL Workbench result grids were captured for:
+- Row counts, missing/invalid case IDs, and distinct valid case IDs.
+- The 24 blank case-ID rows.
+- Repeated case/activity/timestamp groups.
+- The separate duplicate-group check.
+
+No raw CSV files were modified and no records were deleted as part of this review. The validation findings document the checks performed; they do not authorize changes to the source dataset.
+
+### 10.6 Queries Used
+
+The validation covered:
+1. Row counts for `sepsis_raw_import` and `sepsis_event_log`.
+2. Missing/invalid case-ID counts using NULL, blank, and configured placeholder checks.
+3. Distinct valid case-ID counts.
+4. Repeated `(case:concept:name, concept:name, time:timestamp)` combinations.
+5. Exact duplicate full-row checks using the columns included in the duplicate comparison.
+
+The SQL script and captured result grids should be retained as evidence alongside this report. Any additional query text should be saved in the repository only after verifying that it matches the query actually executed.

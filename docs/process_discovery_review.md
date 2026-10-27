@@ -184,3 +184,56 @@ These are Python validation and process-discovery figures. SQL results must be i
 The initial process-discovery output and visual structure have been documented. Team verification of SQL outputs, dataset documentation, data-quality findings, and preparation rules remains necessary before integration.
 
 **Status:** Integration pending team validation and review.
+
+## 11. Team Deliverable Review — 27 October 2026
+
+### Dataset documentation — Poojitha
+
+The latest reviewed commit (`61d556d`) updates the source, citation and redistribution section in `data_dictionary.md`. The direct official source URL was no longer found in the file during review.
+
+**Required follow-up:** Restore the official dataset source URL and provide evidence that all 32 substantive field names match the CSV headers.
+
+**Status:** Correction requested; review pending.
+
+### Data quality — Prasuna
+
+The reviewed `event_log_quality_review.md` documents:
+
+- Source rows: 15,214
+- Missing or blank case IDs: 24
+- Distinct nonblank case IDs: 1,049
+- Exact duplicate full rows after excluding the export-only index: one repeated occurrence across two rows
+- Repeated case/activity/timestamp combinations: seven groups affecting 14 rows
+- Missing activity names and timestamps: zero
+
+The report explicitly states that SQL reconciliation remains pending because the actual SQL database results have not been independently verified against the same source dataset.
+
+**Status:** Findings documented; independent SQL reconciliation pending.
+
+### SQL analysis — Srivaishnavi
+
+The reviewed SQL report documents 15,214 source and destination rows, 1,049 valid cases, 15,190 valid events, 16 activities and five KPI categories.
+
+Review of `sql/sepsis_analysis.sql` identified a filtering inconsistency:
+
+- KPI 1 excludes placeholder case IDs such as `NA`, `N/A`, `NAN`, `NULL` and `NONE`.
+- KPI 2 (average case duration) excludes NULL and blank case IDs but does not exclude those placeholders.
+- KPI 3 (average time between consecutive events) has the same filtering inconsistency.
+
+**Required follow-up:** Apply consistent valid-case filtering to KPI 2 and KPI 3, execute the corrected queries in MySQL Workbench, and update the report with verified outputs.
+
+**Status:** Correction requested; corrected KPI results and execution evidence pending.
+
+### Process-mining prototype — Team lead
+
+The reviewed `process_mining.py`, `analyze_metrics.py` and `create_sample_data.py` use `sample_event_log.csv`, which is a synthetic dataset containing 19 events across four sample cases.
+
+The current scripts demonstrate the initial PM4Py process-discovery workflow and prototype timing analysis. They do not, by themselves, demonstrate process discovery on the actual Sepsis event log.
+
+**Required follow-up:** Validate the process-discovery workflow using the agreed prepared Sepsis event log, preserve the source dataset unchanged, and document the preparation rules and generated outputs.
+
+### Integration decision
+
+No team branch is approved for merging based solely on this review. Dataset documentation, SQL execution results, data-quality reconciliation and actual-dataset process discovery remain subject to verification.
+
+**Status:** Integration pending evidence review and team approval.

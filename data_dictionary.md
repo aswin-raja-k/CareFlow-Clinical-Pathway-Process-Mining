@@ -29,43 +29,53 @@ The dataset contains the three required fields for process mining:
 All three required process-mining fields are present in the actual CSV.
 
 ---
-
 ## 3. Data Dictionary
 
 | No. | Column Name | Description | Data Type / Format |
 |---:|---|---|---|
-| 1 | `case:concept:name` | Unique case identifier used to group events into process traces. | Numeric / identifier |
-| 2 | `concept:name` | Name of the activity or event performed. | Text |
-| 3 | `time:timestamp` | Date and time at which the event occurred. | Timestamp |
-| 4 | `Age` | Age of the patient. | Numeric |
-| 5 | `Diagnose` | Diagnosis associated with the case. | Text |
-| 6 | `DiagnosticArtAstrup` | Result/status of arterial blood gas diagnostic testing. | Text |
-| 7 | `DiagnosticBlood` | Blood diagnostic test information/result. | Text |
-| 8 | `DiagnosticECG` | ECG diagnostic test information/result. | Text |
-| 9 | `DiagnosticIC` | Intensive-care-related diagnostic information. | Text |
-| 10 | `DiagnosticLacticAcid` | Lactic acid diagnostic measurement/result. | Numeric / text |
-| 11 | `DiagnosticLiquor` | Cerebrospinal fluid (liquor) diagnostic information. | Text |
-| 12 | `DiagnosticOther` | Other diagnostic test information. | Text |
+| 1 | `InfectionSuspected` | Indicates whether infection was suspected. | Boolean / text |
+| 2 | `org:group` | Organizational group associated with the event. | Text |
+| 3 | `DiagnosticBlood` | Blood diagnostic test information/result. | Text |
+| 4 | `DisfuncOrg` | Indicates organ dysfunction. | Boolean / text |
+| 5 | `SIRSCritTachypnea` | SIRS criterion related to respiratory rate/tachypnea. | Boolean / text |
+| 6 | `Hypotensie` | Indicator related to hypotension/low blood pressure. | Boolean / text |
+| 7 | `SIRSCritHeartRate` | SIRS criterion related to heart rate. | Boolean / text |
+| 8 | `Infusion` | Records an infusion-related event or treatment. | Text |
+| 9 | `DiagnosticArtAstrup` | Result/status of arterial blood gas diagnostic testing. | Text |
+| 10 | `concept:name` | Name of the activity or event performed. | Text |
+| 11 | `Age` | Age of the patient. | Numeric |
+| 12 | `DiagnosticIC` | Intensive-care-related diagnostic information. | Text |
 | 13 | `DiagnosticSputum` | Sputum diagnostic information. | Text |
-| 14 | `DiagnosticUrinaryCulture` | Urinary culture diagnostic information. | Text |
-| 15 | `DiagnosticUrinarySediment` | Urinary sediment diagnostic information. | Text |
-| 16 | `DiagnosticXray` | X-ray diagnostic information/result. | Text |
-| 17 | `DiagnosticUrinary` | Urinary diagnostic information. | Text |
-| 18 | `DiagnosticCT` | CT scan diagnostic information. | Text |
-| 19 | `DiagnosticMRI` | MRI diagnostic information. | Text |
-| 20 | `DiagnosticOtherBlood` | Other blood-related diagnostic information. | Text |
-| 21 | `DiagnosticOtherMicrobiology` | Other microbiological diagnostic information. | Text |
-| 22 | `DiagnosticOtherImaging` | Other medical imaging diagnostic information. | Text |
-| 23 | `DiagnosticOtherLab` | Other laboratory diagnostic information. | Text |
-| 24 | `DiagnosticOtherProcedure` | Other diagnostic procedure information. | Text |
-| 25 | `DiagnosticOtherClinical` | Other clinical diagnostic information. | Text |
-| 26 | `DiagnosticOtherDiagnostic` | Other diagnostic information not covered by the specified categories. | Text |
-| 27 | `Leucocytes` | Leukocyte/white blood cell laboratory measurement. | Numeric |
-| 28 | `CRP` | C-reactive protein laboratory measurement. | Numeric |
-| 29 | `LacticAcid` | Lactic acid laboratory measurement. | Numeric |
-| 30 | `Hypotension` | Indicator related to hypotension/low blood pressure. | Boolean / text |
-| 31 | `Hypoxemia` | Indicator related to hypoxemia/low blood oxygen. | Boolean / text |
-| 32 | `Sepsis` | Indicator related to sepsis status. | Boolean / text |
+| 14 | `DiagnosticLiquor` | Cerebrospinal fluid (liquor) diagnostic information. | Text |
+| 15 | `DiagnosticOther` | Other diagnostic test information. | Text |
+| 16 | `SIRSCriteria2OrMore` | Indicates whether two or more SIRS criteria were met. | Boolean / text |
+| 17 | `DiagnosticXthorax` | X-thorax/X-ray diagnostic information or result. | Text |
+| 18 | `SIRSCritTemperature` | SIRS criterion related to temperature. | Boolean / text |
+| 19 | `time:timestamp` | Date and time at which the event occurred. | Timestamp |
+| 20 | `DiagnosticUrinaryCulture` | Urinary culture diagnostic information. | Text |
+| 21 | `SIRSCritLeucos` | SIRS criterion related to leukocyte count. | Boolean / text |
+| 22 | `Oligurie` | Indicates oliguria/reduced urine output. | Boolean / text |
+| 23 | `DiagnosticLacticAcid` | Lactic acid diagnostic measurement/result. | Numeric / text |
+| 24 | `lifecycle:transition` | Records the lifecycle transition of the event. | Text |
+| 25 | `Diagnose` | Diagnosis associated with the case. | Text |
+| 26 | `Hypoxie` | Indicator related to hypoxia/low blood oxygen. | Boolean / text |
+| 27 | `DiagnosticUrinarySediment` | Urinary sediment diagnostic information. | Text |
+| 28 | `DiagnosticECG` | ECG diagnostic test information/result. | Text |
+| 29 | `case:concept:name` | Unique case identifier used to group events into process traces. | Numeric / identifier |
+| 30 | `Leucocytes` | Leukocyte/white blood cell laboratory measurement. | Numeric |
+| 31 | `CRP` | C-reactive protein laboratory measurement. | Numeric |
+| 32 | `LacticAcid` | Lactic acid laboratory measurement. | Numeric |
+
+**Technical/Index Column**
+
+| Column Name | Description | Data Type / Format |
+|---|---|---|
+| `Unnamed: 0` | Technical/index column present in the CSV file; not treated as a substantive dataset field. | Numeric / index |
+ 
+**Column Count Verification:**  
+- Total CSV columns: **33**
+- Substantive dataset fields: **32**
+- Technical/index column: **`Unnamed: 0`**
 
 > **Note:** The 32 substantive fields above are the dataset attributes used for documentation. The additional `Unnamed: 0` column is treated separately as a technical row index.
 
@@ -169,35 +179,17 @@ However, the timestamp randomization must be clearly documented when interpretin
 
 ---
 
-## 7. Source, Citation and Redistribution Verification
+## 7. Dataset Source and Citation
 
-Dataset: Sepsis Cases - Event Log
-Creator: Felix Mannhardt
-Publisher: 4TU.ResearchData
-Version: 1
-DOI: 10.4121/uuid:915d2bfb-7e84-49ad-a286-dc35f063a460
-Licence: 4TU General Terms of Use
-### Citation
+**Dataset:** Sepsis Cases - Event Log  
+**Creator:** Felix Mannhardt  
+**Publisher:** 4TU.ResearchData  
+**Version:** 1  
+**Official Source:** https://data.4tu.nl/articles/_/12707639/1  
+**DOI:** 10.4121/uuid:915d2bfb-7e84-49ad-a286-dc35f063a460  
+**Licence:** 4TU General Terms of Use  
 
-Mannhardt, Felix (2016): *Sepsis Cases - Event Log*. Version 1. 4TU.ResearchData. Dataset. https://doi.org/10.4121/uuid:915d2bfb-7e84-49ad-a286-dc35f063a460
-
-### Usage Terms
-
-The official 4TU.ResearchData page lists the dataset licence as **4TU General Terms of Use**.
-
-### Redistribution Status
-
-The dataset is provided under the **4TU General Terms of Use**. Redistribution is permitted subject to the conditions specified in those terms, including appropriate source and creator acknowledgement and the applicable non-commercial-use requirements.
-
-For this project, the original source, creator, DOI, and applicable usage conditions are documented below in Section 8.
-Redistribution status: Permitted under the 4TU General Terms of Use
-### Verification Evidence
-
-- Official dataset source and DOI verified.
-- Dataset licence verified as **4TU General Terms of Use**.
-- CSV schema documented against the available dataset.
-- No dataset rows were modified or removed during verification.
----
+The dataset is used for the CareFlow clinical pathway process-mining analysis. The official 4TU.ResearchData source and DOI are retained for attribution and dataset identification.
 
 ## 8. Usage and Redistribution Terms
 
@@ -213,9 +205,7 @@ For this project:
 - The DOI and official dataset record should be provided.
 - The dataset must not be used for commercial purposes.
 - Any subsequent redistribution should retain the required acknowledgement.
-
 **Redistribution status:** Permitted under the 4TU General Terms of Use, subject to the above conditions.
-
 **Official terms:** 4TU General Terms of Use, August 2016.
 
 ## 9. Dataset Selection Rationale
@@ -257,25 +247,30 @@ The randomized timestamp limitation must be considered when interpreting time-re
 | Source | 4TU.ResearchData |
 | DOI | `10.4121/uuid:915d2bfb-7e84-49ad-a286-dc35f063a460` |
 | Usage terms | 4TU General Terms of Use |
-| Raw dataset for GitHub | Do not upload until redistribution terms are confirmed |
+| Raw dataset for GitHub | Permitted under the 4TU General Terms of Use, subject to the stated conditions |
 
 --
 ## 11. Verification Status
 
 The `Sepsis Cases - Event Log.csv` schema was verified against the 32 substantive fields documented in this data dictionary.
 
+## 11. Verification Status
+
+The `Sepsis Cases - Event Log.csv` schema was verified against the 32 substantive fields documented in this data dictionary.
+
 ### Verification Evidence
 
-- 32 substantive dataset fields were checked against the documented column names.
-- The technical `Unnamed: 0` column is documented separately and is not treated as a substantive dataset field.
+- All 32 substantive field names were compared directly with the actual CSV header row.
+- All 32 substantive field names match the actual CSV headers.
+- `Unnamed: 0` is documented separately as the technical/index column.
 - The three core process-mining fields were verified:
   - `case:concept:name`
   - `concept:name`
   - `time:timestamp`
-- Dataset source, author, year, version and DOI were verified against the 4TU.ResearchData information.
-- The dataset is licensed under the 4TU General Terms of Use.
-- Redistribution is subject to the conditions specified by those terms, including appropriate source/creator acknowledgement and applicable non-commercial requirements.
-- The timestamp randomization limitation remains documented.
-- No dataset rows or original values were modified as part of this documentation verification.
+- The official 4TU.ResearchData source URL was verified and restored.
+- The dataset citation and DOI were verified.
+- The licence was verified as 4TU General Terms of Use.
+- Redistribution terms were documented consistently without duplicate status statements.
+- No dataset rows or original values were modified.
 
-**Verification date:** 23 October 2026
+Verification date: 27 October 2026

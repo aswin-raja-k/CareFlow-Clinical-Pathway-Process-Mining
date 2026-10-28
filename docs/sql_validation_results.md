@@ -1,206 +1,228 @@
-# CareFlow: Clinical Pathway Process Mining
+﻿# CareFlow: Clinical Pathway Process Mining
+## Sepsis Event Log â€” SQL Validation and KPI Analysis Report
 
-## Sepsis Event Log — SQL Analysis and Validation Report
+**Project:** CareFlow â€” Clinical Pathway Process Mining
+**Analysis:** Sepsis Event Log Validation and KPI Analysis
+**Database:** `careflow`
+**Source table:** `sepsis_raw_import`
+**Analysis table:** `sepsis_event_log`
+**SQL script:** `sql/sepsis_analysis.sql`
+**Branch:** `srivaishnavi-sql-analysis`
+**Report date:** 28 October 2026
 
-### 1. Objective
+---
 
-The objective of this task was to validate the Sepsis event log using MySQL, investigate data-quality issues, calculate key performance indicators (KPIs), and analyze clinical pathway activity patterns.
+## 1. Project Overview
 
-The analysis investigated the difference between 1,050 distinct IDs and 1,049 valid cases by standardizing the treatment of invalid case identifiers, including the literal value `NA`.
+This report documents the SQL-based validation and process analysis of the Sepsis event log for the CareFlow project. The analysis uses MySQL to validate the imported dataset, identify invalid case identifiers, examine duplicate records, and calculate five process-analysis Key Performance Indicators (KPIs).
 
-### 2. Tools and Technologies
+The objective is to establish a consistent dataset for process mining and provide reproducible SQL results for team review and integration.
 
-- **Database:** MySQL
-- **SQL Editor:** MySQL Workbench
-- **Dataset:** Sepsis Event Log
-- **Schema:** `careflow`
-- **Source table:** `sepsis_raw_import`
-- **Analysis table:** `sepsis_event_log`
-- **Version control:** Git and GitHub
+## 2. Dataset and Validation
 
-### 3. Data Validation
+The source event log was imported into the `careflow` database. The raw import table preserves the imported data, while the analysis table contains the structured columns used for SQL queries.
 
-The source dataset was compared with the destination analysis table to verify successful data loading and consistency in total record counts.
+### Dataset validation results
 
 | Validation check | Result |
 |---|---:|
 | Source rows | 15,214 |
 | Destination rows | 15,214 |
 | Row-count difference | 0 |
-| Total events | 15,214 |
+| Invalid case-ID rows | 24 |
+| Valid case IDs | 1,049 |
+| Valid events after case-ID filtering | 15,190 |
 | Distinct activities | 16 |
-| Rows with invalid case IDs | 24 |
-| Distinct IDs including placeholders | 1,050 |
-| Distinct valid cases | 1,049 |
-| Valid event rows after excluding invalid case IDs | 15,190 |
 | Missing timestamps | 0 |
-| Overall row-count validation | PASS |
 
-**Observations**
+The source and destination row counts match, confirming that all 15,214 source rows are represented in the destination table.
 
-The source and destination tables contain the same number of records, confirming that their total row counts match.
+The analysis identified 24 events associated with the placeholder case ID `NA`. These records are excluded from the valid-case KPI calculations. The resulting analysis population contains 15,190 events across 1,049 valid cases.
 
-The validation identified 24 event rows associated with the literal case ID `NA`. These rows were excluded from the corrected case-based KPI calculations.
+### Case-ID validation rules
 
-The distinct-ID comparison returned 1,050 when placeholders were included and 1,049 after invalid case IDs were excluded. This explains the difference between the original and corrected valid-case counts.
+The KPI queries exclude case IDs that are:
 
-### 4. Activity Frequency Analysis
+- SQL `NULL` values
+- Empty strings or whitespace-only strings
+- `NA`
+- `N/A`
+- `NAN`
+- `NULL` represented as text
+- `NONE`
 
-Activity frequencies were analyzed to identify the most common clinical activities in the original event log.
+The filtering conditions use `IS NOT NULL`, `TRIM()` and `UPPER()` to handle missing and placeholder identifiers consistently. Time-based KPIs also exclude records with missing timestamps.
 
-| Activity | Event count |
+## 3. Duplicate Record Analysis
+
+The duplicate-record check identified one duplicate group with one additional matching row.
+
+| Check | Result |
 |---|---:|
-| Leucocytes | 3,383 |
-| CRP | 3,262 |
-| LacticAcid | 1,466 |
-| Admission NC | 1,182 |
-| ER Triage | 1,053 |
-| ER Registration | 1,050 |
-| ER Sepsis Triage | 1,049 |
-| IV Antibiotics | 823 |
-| IV Liquid | 753 |
-| Release A | 671 |
-| Return ER | 294 |
-| Admission IC | 117 |
-| Release B | 56 |
-| Release C | 25 |
-| Release D | 24 |
-| Release E | 6 |
-| **Total events** | **15,214** |
+| Duplicate groups | 1 |
+| Additional duplicate rows | 1 |
 
-**Observations**
+Duplicate detection is used as a data-quality check. The identified record is documented for review; the duplicate check does not automatically imply that the record should be deleted.
 
-Leucocytes and CRP are the most frequent activities, followed by LacticAcid. Release E has the lowest event count.
+## 4. KPI Analysis and Results
 
-These frequencies represent the original event log. They include events associated with invalid case identifiers, unlike the corrected case-based KPI calculations.
+The five KPIs below describe event frequency, case duration, event intervals, repeated activities, and emergency-department returns.
 
-### 5. Key Performance Indicators (KPIs)
+### KPI 1: Average Events per Case
 
-Five KPI categories were calculated using SQL. The corrected case-based analysis excludes invalid case identifiers according to the standardized filtering rule.
+**Purpose:** Measure the average number of recorded events per valid case.
 
-| KPI | Result |
+**Calculation:**
+
+Average events per case = Total valid events / Number of valid cases
+
+| Metric | Result |
 |---|---:|
+| Valid events | 15,190 |
+| Valid cases | 1,049 |
 | Average events per case | 14.4805 |
+
+**Interpretation:** Each valid case contains approximately 14.48 recorded events on average. This provides a measure of the event-log detail available for process analysis.
+
+### KPI 2: Average Case Duration
+
+**Purpose:** Calculate the average elapsed time between the first and last recorded events for each valid case.
+
+**Calculation:**
+
+Case duration = Last event timestamp âˆ’ First event timestamp
+
+The duration is calculated for each valid case in minutes, after which the case durations are averaged.
+
+| Metric | Result |
+|---|---:|
 | Average case duration | 41,017.73047 minutes |
+| Approximate duration in hours | 683.63 hours |
+| Approximate duration in days | 28.48 days |
+
+**Interpretation:** The recorded timestamps produce an average case duration of approximately 28.48 days. This is a timestamp-derived metric and must not be interpreted as actual patient treatment duration without confirming the clinical validity of the timestamps.
+
+### KPI 3: Average Time Between Consecutive Events
+
+**Purpose:** Measure the average time interval between consecutive recorded events within valid cases.
+
+**Calculation:**
+
+Event interval = Current event timestamp âˆ’ Previous event timestamp
+
+The SQL query uses the `LAG()` window function to obtain the preceding event timestamp within each case. The first event in each case has no preceding event and is excluded from the interval calculation.
+
+| Metric | Result |
+|---|---:|
 | Average time between consecutive events | 3,042.75506 minutes |
+| Approximate interval in hours | 50.71 hours |
+| Approximate interval in days | 2.11 days |
+
+**Interpretation:** The calculated average interval between consecutive events is approximately 50.71 hours. It represents the intervals derived from the recorded event timestamps, rather than a verified measure of clinical waiting time.
+
+### KPI 4: Cases with Repeated Activities
+
+**Purpose:** Identify valid cases in which the same activity occurs more than once.
+
+| Metric | Result |
+|---|---:|
+| Valid cases | 1,049 |
 | Cases with repeated activities | 743 |
-| Cases with repeated activities (%) | 70.83% |
+| Percentage of valid cases | 70.83% |
+
+**Calculation:**
+
+Percentage = (Cases with repeated activities / Valid cases) Ã— 100
+
+**Interpretation:** Approximately 70.83% of valid cases contain repeated activities. Repetition may reflect recurring clinical steps, repeated assessments, or other process patterns. The metric alone does not establish whether a repetition is unnecessary or indicates a process problem.
+
+### KPI 5: Cases Containing `Return ER`
+
+**Purpose:** Measure the number and proportion of valid cases containing the `Return ER` activity.
+
+| Metric | Result |
+|---|---:|
+| Valid cases | 1,049 |
 | Cases containing `Return ER` | 294 |
-| Cases containing `Return ER` (%) | 28.03% |
-
-#### KPI 1: Average Events per Case
-
-**Result:** 14.4805 events per valid case.
-
-This KPI measures the average number of valid recorded events associated with each valid case.
+| Percentage of valid cases | 28.03% |
 
 **Calculation:**
 
-Average events per case = Valid event rows / Valid distinct cases
+Percentage = (Cases containing `Return ER` / Valid cases) Ã— 100
 
-#### KPI 2: Average Case Duration
+**Interpretation:** The `Return ER` activity occurs in 294 valid cases, representing 28.03% of the valid-case population. This indicates the frequency of the activity in the event log; it does not independently establish a clinical readmission rate or patient outcome.
 
-**Result:** 41,017.73047 minutes.
+## 5. Summary of KPI Results
 
-This KPI measures the elapsed time between the first and last recorded event for each valid case.
+| No. | KPI | Result |
+|---:|---|---:|
+| 1 | Average events per case | 14.4805 |
+| 2 | Average case duration | 41,017.73047 minutes |
+| 3 | Average time between consecutive events | 3,042.75506 minutes |
+| 4 | Cases with repeated activities | 743 (70.83%) |
+| 5 | Cases containing `Return ER` | 294 (28.03%) |
 
-**Calculation:**
+All five KPIs use the valid-case population of 1,049 cases. The corresponding event-level analysis population contains 15,190 events.
 
-Case duration = Last event timestamp − First event timestamp
+## 6. SQL Implementation
 
-The average case duration represents elapsed time between recorded events rather than active treatment time.
+The analysis is implemented in `sql/sepsis_analysis.sql` and includes the following operations:
 
-#### KPI 3: Average Time Between Consecutive Events
+1. Validate source and destination row counts.
+2. Check invalid case identifiers and missing timestamps.
+3. Inspect duplicate records and activity frequencies.
+4. Calculate average events per case.
+5. Calculate average case duration using event timestamps.
+6. Calculate intervals between consecutive events using `LAG()`.
+7. Count cases containing repeated activities.
+8. Count cases containing the `Return ER` activity.
 
-**Result:** 3,042.75506 minutes.
+The case-ID filters exclude SQL `NULL`, blank identifiers, and the specified placeholder values. Time-based calculations require valid timestamps.
 
-This KPI measures the average time gap between consecutive events within valid cases.
+The SQL script is maintained in the `srivaishnavi-sql-analysis` branch of the project repository.
 
-**Calculation:**
+## 7. Evidence and Reproducibility
 
-Time between events = Current event timestamp − Previous event timestamp
+The following evidence files are maintained in the project's `evidence/` directory:
 
-Events are ordered by timestamp within each case. The result describes elapsed time between recorded events.
+| Evidence file | Description |
+|---|---|
+| `01_main_validation.png` | Main dataset validation |
+| `02_invalid_case_id_records.png` | Invalid case-ID records |
+| `03_case_count_discrepancy.png` | Case-count comparison |
+| `04_duplicate_check.png` | Duplicate-record analysis |
+| `05_kpi_avg_events_per_case.png` | KPI 1 output |
+| `06_kpi_avg_case_duration.png` | KPI 2 output |
+| `07_kpi_avg_time_between_events.png` | KPI 3 output |
+| `08_kpi_repeated_activities.png` | KPI 4 output |
+| `09_kpi_return_er.png` | KPI 5 output |
 
-#### KPI 4: Repeated Activities
+The SQL script and evidence files provide the basis for reproducing and reviewing the reported calculations in MySQL Workbench.
 
-**Result:** 743 out of 1,049 valid cases, approximately 70.83%.
+## 8. Data Limitations and Interpretation
 
-This KPI identifies valid cases in which at least one activity occurs more than once, according to the implemented SQL query.
+**Timestamp validity:** The event timestamps may have been randomized or otherwise altered in the dataset. Consequently, the calculated case durations and intervals between events describe the stored timestamps and should not be treated as actual clinical durations or waiting times without validating the source timestamp semantics.
 
-Repeated activities can indicate recurring tests, repeated procedures, or other patterns in the clinical pathway. Their interpretation depends on the event sequence and clinical context.
+**Invalid identifiers:** The 24 events associated with the placeholder case ID `NA` are excluded from the valid-case analysis to avoid treating missing identifiers as a genuine patient case.
 
-#### KPI 5: Return ER
+**Duplicate records:** One duplicate group with one additional matching row was identified. It is documented as a data-quality finding and is not automatically removed by the analysis.
 
-**Result:** 294 out of 1,049 valid cases, approximately 28.03%.
+**Process interpretation:** Repeated activities and `Return ER` occurrences are descriptive indicators. Further clinical and process context is needed before drawing conclusions about care quality, inefficiency, readmission, or patient outcomes.
 
-This KPI identifies valid cases containing the `Return ER` activity.
+## 9. Conclusion
 
-The result indicates how frequently this activity appears across valid cases and supports further investigation of emergency-room return patterns.
+The Sepsis event log contains 15,214 imported rows, with matching source and destination row counts. After excluding 24 events associated with invalid case identifiers, the analysis uses 15,190 events across 1,049 valid cases.
 
-### 6. Duplicate Investigation
+The SQL analysis produces five process-analysis KPIs: average events per case, average case duration, average time between consecutive events, cases with repeated activities, and cases containing `Return ER`. The results provide a quantitative foundation for the CareFlow process-mining workflow.
 
-A duplicate-check query grouped events by case ID, activity name, event timestamp, and lifecycle transition. The query returned seven candidate duplicate groups, each containing two occurrences.
+The SQL script, validation report, and supporting evidence are organized in the `srivaishnavi-sql-analysis` branch for team review. The timestamp-validity limitation remains essential when interpreting time-based results.
 
-The groups identified were:
+---
 
-| Case ID | Activity | Timestamp | Occurrences |
-|---|---|---|---:|
-| UM | Leucocytes | 2014-09-25 11:09:00 | 2 |
-| ZM | CRP | 2014-04-15 09:00:00 | 2 |
-| ZM | Leucocytes | 2014-04-15 09:00:00 | 2 |
-| YO | Leucocytes | 2014-06-05 08:00:00 | 2 |
-| YO | CRP | 2014-06-05 08:00:00 | 2 |
-| ES | Leucocytes | 2014-11-08 05:50:00 | 2 |
-| NGA | LacticAcid | 2014-06-18 07:00:00 | 2 |
-
-These are candidate duplicate groups based on the selected columns. Matching values across these columns do not, by themselves, prove that the records are erroneous duplicates. No records were deleted during this validation task.
-
-### 7. Case-Count Discrepancy and Data-Quality Considerations
-
-The distinct-ID validation returned the following results:
-
-- Distinct IDs including placeholders: **1,050**
-- Distinct valid cases after excluding placeholders: **1,049**
-- Event rows associated with the literal `NA` case ID: **24**
-
-The literal text `NA` is not the same as a SQL `NULL` value. Therefore, a query that checks only for `NULL` or empty strings may still count `NA` as a distinct case identifier.
-
-The corrected SQL filtering rule excludes blank values and recognized placeholder values, including `NA`, `N/A`, `NAN`, `NULL`, and `NONE`, from valid-case calculations.
-
-This explains the SQL case-count difference observed during validation. A Python comparison has not yet been performed, so cross-validation between SQL and Python remains unverified.
-
-Activity-frequency results describe the original event log, while the corrected case-based KPIs use the filtered data. This distinction is maintained throughout the report.
-
-### 8. SQL–Python Comparison Status
-
-A Python validation script was not available for this task, and no Python KPI calculations were performed.
-
-Consequently, the SQL results have not yet been compared with Python results. The case-count discrepancy has been explained using SQL validation outputs, but it should not be described as a confirmed SQL–Python comparison.
-
-If Python comparison is required, a script should be created or obtained and configured to use the same invalid-ID rules, timestamp handling, event ordering, and KPI definitions as the SQL analysis. Any actual differences can then be recorded.
-
-### 9. Conclusion
-
-SQL-based validation and KPI analysis were performed on the Sepsis event log as part of the CareFlow: Clinical Pathway Process Mining project.
-
-The source and destination tables were verified to contain 15,214 rows each. The validation identified 24 event rows associated with the literal `NA` case ID. After excluding invalid case identifiers, the corrected analysis covered 15,190 event rows across 1,049 valid cases.
-
-The analysis documented activity frequencies, average events per case, average case duration, average time between consecutive events, repeated activities, and the occurrence of the `Return ER` activity.
-
-The duplicate investigation identified seven candidate duplicate groups, which were retained pending further investigation. The discrepancy between 1,050 IDs and 1,049 valid cases was explained by the treatment of placeholder case identifiers.
-
-The SQL validation and KPI results provide a documented baseline for further process-mining analysis. Python comparison remains pending.
-
-### 10. Final Validation Status
-
-- **Row-count validation:** PASS — source and destination tables each contain 15,214 rows.
-- **Case identifier validation:** 24 event rows associated with the literal `NA` value identified.
-- **Distinct case validation:** 1,050 IDs including placeholders; 1,049 valid cases after filtering.
-- **Valid analysis dataset:** 15,190 event rows across 1,049 valid cases.
-- **Missing timestamps:** 0.
-- **Activity analysis:** 16 distinct activities identified.
-- **KPI analysis:** All five KPI categories have SQL results recorded.
-- **Duplicate review:** Seven candidate duplicate groups identified; records retained.
-- **SQL–Python comparison:** Pending; no Python script or comparison results are currently available.
-- **Documentation:** Updated report is saved in `docs/sql_validation_results.md`.
+**Project:** CareFlow â€” Clinical Pathway Process Mining
+**Module:** Sepsis Event Log SQL Analysis
+**Database:** MySQL (`careflow`)
+**Primary SQL file:** `sql/sepsis_analysis.sql`
+**Documentation:** `docs/sql_validation_results.md`
+**Evidence directory:** `evidence/`
+**Working branch:** `srivaishnavi-sql-analysis`

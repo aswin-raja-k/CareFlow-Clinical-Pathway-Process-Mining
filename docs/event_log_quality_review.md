@@ -326,3 +326,13 @@ The query is included for reproducibility. The counts above are transcribed from
 - Exact duplicate content: one repeated occurrence in the CSV review when excluding the exported index; equivalence with the separate SQL duplicate-group check remains unverified.
 - Source data: no CSV values were changed and no records were deleted.
 - Issue #11: keep open until the duplicate comparison is reproduced and the results are independently reviewed and approved.
+
+
+
+### Duplicate Validation
+
+The MySQL validation query grouped records by case ID, activity name, and timestamp. The query returned 7 repeated groups, covering 14 rows and 7 extra occurrences.
+
+The CSV review identified one exact duplicate full row when the exported index column was excluded from comparison. These results use different definitions: the full-row check compares all data fields, while the grouped check compares only case ID, activity, and timestamp. Therefore, the counts are not directly equivalent.
+
+The original CSV and database records were not deleted or modified during this validation. The exact-duplicate count should be confirmed against the same database table and column set before final approval.

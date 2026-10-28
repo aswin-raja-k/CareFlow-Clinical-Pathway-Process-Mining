@@ -237,3 +237,49 @@ The current scripts demonstrate the initial PM4Py process-discovery workflow and
 No team branch is approved for merging based solely on this review. Dataset documentation, SQL execution results, data-quality reconciliation and actual-dataset process discovery remain subject to verification.
 
 **Status:** Integration pending evidence review and team approval.
+
+## 12. Actual-Dataset Process Discovery — 28 October 2026
+
+### Dataset validation
+
+The prepared event log at `outputs/prepared_sepsis_event_log.csv` was inspected locally.
+
+- Raw event-log rows: 15,214
+- Prepared event rows: 15,183
+- Prepared columns: `case:concept:name`, `concept:name`, `time:timestamp`
+- Distinct valid cases: 1,049
+- Distinct activities: 16
+- Invalid case IDs in prepared data: 0
+- Missing activity names: 0
+- Missing timestamps: 0
+- Repeated case/activity/timestamp groups in prepared data: 0
+
+The prepared dataset contains 31 fewer rows than the raw event log. The exact reconciliation of those removed rows against the agreed preparation rules remains to be verified.
+
+### Process discovery execution
+
+The PM4Py Inductive Miner process-discovery workflow was executed successfully against the prepared event log.
+
+- PM4Py version: 2.7.23.9
+- Pandas version: 3.0.6
+- Events processed: 15,183
+- Cases processed: 1,049
+- Activities identified: 16
+- Generated visualization: `outputs/sepsis_process_tree.png`
+
+The generated process tree was opened and visually inspected. It contains sequential (`seq`), parallel (`and`), exclusive-choice (`xor`), and loop (`xor loop`) operators.
+
+### Interpretation and limitations
+
+This is an initial discovered process model, not a confirmed clinical pathway. The model requires further path validation and team review.
+
+The dataset documentation states that timestamps were randomized while preserving intervals within individual traces. Calendar dates must not be interpreted as authentic hospital dates, and time-based findings must be described with this limitation.
+
+### Next steps
+
+- Reconcile the 31-row difference against the agreed preparation rules.
+- Review discovered paths and process variants.
+- Compare SQL and Python results only after confirming equivalent filtering rules and KPI definitions.
+- Keep generated outputs and raw/prepared data separate from source files; do not commit `sepsis_event_log.csv` or `outputs/prepared_sepsis_event_log.csv`.
+
+**Status:** Actual-dataset process discovery executed successfully; preparation reconciliation and team validation remain pending.

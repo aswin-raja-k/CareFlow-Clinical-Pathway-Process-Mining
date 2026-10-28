@@ -299,9 +299,10 @@ FROM (
         ) / 60.0 AS duration_minutes
     FROM sepsis_event_log
     WHERE `case:concept:name` IS NOT NULL
-      AND UPPER(TRIM(`case:concept:name`))
-          NOT IN ('', 'NA', 'N/A', 'NAN', 'NULL', 'NONE')
-      AND `time:timestamp` IS NOT NULL
+  AND TRIM(`case:concept:name`) <> ''
+  AND UPPER(TRIM(`case:concept:name`))
+      NOT IN ('NA', 'N/A', 'NAN', 'NULL', 'NONE')
+  AND `time:timestamp` IS NOT NULL
     GROUP BY `case:concept:name`
 ) AS case_durations;
 
@@ -327,9 +328,10 @@ WITH ordered_events AS (
         ) AS previous_event_time
     FROM sepsis_event_log
     WHERE `case:concept:name` IS NOT NULL
-      AND UPPER(TRIM(`case:concept:name`))
-          NOT IN ('', 'NA', 'N/A', 'NAN', 'NULL', 'NONE')
-      AND `time:timestamp` IS NOT NULL
+  AND TRIM(`case:concept:name`) <> ''
+  AND UPPER(TRIM(`case:concept:name`))
+      NOT IN ('NA', 'N/A', 'NAN', 'NULL', 'NONE')
+  AND `time:timestamp` IS NOT NULL
 )
 SELECT
     ROUND(

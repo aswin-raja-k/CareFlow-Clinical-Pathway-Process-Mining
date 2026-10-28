@@ -214,3 +214,115 @@ The validation covered:
 5. Exact duplicate full-row checks using the columns included in the duplicate comparison.
 
 The SQL script and captured result grids should be retained as evidence alongside this report. Any additional query text should be saved in the repository only after verifying that it matches the query actually executed.
+
+
+
+## 11. Data Quality Reconciliation — 28 October 2026
+
+### 11.1 Case-ID Validation Results
+
+The MySQL Workbench result screenshots supplied for this review show the following results for both `sepsis_raw_import` and `sepsis_event_log`.
+
+| Metric | Raw import | Event log |
+|---|---:|---:|
+| Total rows | 15,214 | 15,214 |
+| Missing or invalid case-ID rows | 24 | 24 |
+| Valid case-ID rows | 15,190 | 15,190 |
+| Distinct valid case IDs | 1,049 | 1,049 |
+
+A case ID is considered invalid if it is NULL, blank or whitespace-only, or a configured placeholder after trimming and converting to uppercase: `NA`, `NAN`, `NULL`, `NONE`, `N/A`, or `?`.
+
+The valid case-ID row count is calculated as:
+
+`15,214 - 24 = 15,190`
+
+Here, **15,190 valid events** means rows with valid case IDs. It does not certify every other field in those rows as valid.
+
+The captured SQL results support 24 invalid case-ID rows and 1,049 distinct valid case IDs in each table. An older SQL summary reported zero missing IDs and 1,050 unique cases. Those figures conflict with the captured validation results and must not be treated as reconciled.
+
+### 11.2 Duplicate Validation
+
+The CSV review identified one repeated full event-content row when the export-only `Unnamed: 0` index column was excluded from the comparison. The matching rows were at zero-based source indices 7160 and 7161.
+
+Comparing all 33 columns, including the exported index, reports zero exact duplicates because the index values differ.
+
+The supplied SQL result grid separately showed:
+
+- Repeated case/activity/timestamp groups: 7
+- Rows in those groups: 14
+- Extra occurrences beyond one row per group: 7
+- Separate SQL duplicate-group check: 0 groups
+
+These results measure different things. A repeated case/activity/timestamp key does not necessarily mean every event-content field is identical.
+
+The exact SQL duplicate-check query and its full comparison-column list were not completely visible in the supplied screenshots. Therefore, the SQL result of zero duplicate groups cannot yet be confirmed as equivalent to the CSV comparison that found one repeated event-content row. This discrepancy remains unresolved.
+
+### 11.3 Consistent Case-ID Validation Query
+
+The following query applies the same invalid-ID rule to both tables.
+
+```sql
+USE careflow;
+
+SELECT
+    'sepsis_raw_import' AS table_name,
+    COUNT(*) AS total_rows,
+    SUM(
+        `case:concept:name` IS NULL
+        OR TRIM(`case:concept:name`) = ''
+        OR UPPER(TRIM(`case:concept:name`)) IN
+           ('NA', 'NAN', 'NULL', 'NONE', 'N/A', '?')
+    ) AS invalid_case_id_rows,
+    COUNT(*) - SUM(
+        `case:concept:name` IS NULL
+        OR TRIM(`case:concept:name`) = ''
+        OR UPPER(TRIM(`case:concept:name`)) IN
+           ('NA', 'NAN', 'NULL', 'NONE', 'N/A', '?')
+    ) AS valid_case_id_rows,
+    COUNT(DISTINCT CASE
+        WHEN `case:concept:name` IS NOT NULL
+         AND TRIM(`case:concept:name`) <> ''
+         AND UPPER(TRIM(`case:concept:name`)) NOT IN
+             ('NA', 'NAN', 'NULL', 'NONE', 'N/A', '?')
+        THEN TRIM(`case:concept:name`)
+    END) AS distinct_valid_case_ids
+FROM sepsis_raw_import
+
+UNION ALL
+
+SELECT
+    'sepsis_event_log' AS table_name,
+    COUNT(*) AS total_rows,
+    SUM(
+        `case:concept:name` IS NULL
+        OR TRIM(`case:concept:name`) = ''
+        OR UPPER(TRIM(`case:concept:name`)) IN
+           ('NA', 'NAN', 'NULL', 'NONE', 'N/A', '?')
+    ) AS invalid_case_id_rows,
+    COUNT(*) - SUM(
+        `case:concept:name` IS NULL
+        OR TRIM(`case:concept:name`) = ''
+        OR UPPER(TRIM(`case:concept:name`)) IN
+           ('NA', 'NAN', 'NULL', 'NONE', 'N/A', '?')
+    ) AS valid_case_id_rows,
+    COUNT(DISTINCT CASE
+        WHEN `case:concept:name` IS NOT NULL
+         AND TRIM(`case:concept:name`) <> ''
+         AND UPPER(TRIM(`case:concept:name`)) NOT IN
+             ('NA', 'NAN', 'NULL', 'NONE', 'N/A', '?')
+        THEN TRIM(`case:concept:name`)
+    END) AS distinct_valid_case_ids
+FROM sepsis_event_log;
+```
+
+The query is included for reproducibility. The counts above are transcribed from the supplied MySQL Workbench screenshots; a fresh execution should be captured before claiming independent revalidation.
+
+### 11.4 Status and Change Control
+
+- Case-ID counts: consistent between both tables in the supplied SQL output.
+- Valid case-ID rows: 15,190 per table, calculated from the displayed counts.
+- Distinct valid cases: 1,049 per table.
+- Repeated event keys: 7 groups, 14 rows, and 7 extra occurrences in the captured SQL output.
+- Exact duplicate content: one repeated occurrence in the CSV review when excluding the exported index; equivalence with the separate SQL duplicate-group check remains unverified.
+- Source data: no CSV values were changed and no records were deleted.
+- Issue #11: keep open until the duplicate comparison is reproduced and the results are independently reviewed and approved.

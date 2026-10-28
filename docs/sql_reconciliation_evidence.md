@@ -109,6 +109,24 @@ The CSV review also found:
 
 These results use different comparison definitions and should not be treated as contradictory. The separate SQL duplicate-group result applies only to the columns and comparison method used in that query.
 
+
+### Latest Full-Row Duplicate Comparison — 28 October 2026
+
+A follow-up MySQL query was run against `sepsis_event_log`, grouping records by all table columns except the auto-generated `event_id`.
+
+| Validation | Result |
+|---|---:|
+| Duplicate groups | 1 |
+| Rows in duplicate groups | 2 |
+| Extra occurrences | 1 |
+
+This result identifies one pair of identical records under the query's comparison rules. It agrees numerically with the CSV review, which found one repeated row when the exported `Unnamed: 0` index column was excluded.
+
+The earlier separate duplicate-group check returned zero groups, while the case/activity/timestamp check returned seven repeated groups, 14 rows, and seven extra occurrences. These results use different comparison rules and must be reported separately.
+
+**Limitation:** Before final approval, confirm that the database columns compared by this query correspond to all CSV data columns except the exported index. No source records were modified or deleted.
+
+
 ## 6. Reconciliation of Earlier Counts
 
 An earlier SQL summary reported zero missing case IDs and 1,050 unique cases. The captured validation results from 27 October instead show 24 missing/invalid case-ID rows and 1,049 distinct valid case IDs in both tables.

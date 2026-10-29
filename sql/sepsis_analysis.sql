@@ -286,12 +286,15 @@ FROM (
 -- ============================================================
 
 
+-- KPI 2: Average case duration in minutes
+-- Excludes NULL, blank and placeholder case IDs.
+
 SELECT
     ROUND(AVG(duration_minutes), 5)
         AS avg_case_duration_minutes
 FROM (
     SELECT
-        `case:concept:name` AS case_id,
+        TRIM(`case:concept:name`) AS case_id,
         TIMESTAMPDIFF(
             SECOND,
             MIN(`time:timestamp`),
@@ -299,12 +302,13 @@ FROM (
         ) / 60.0 AS duration_minutes
     FROM sepsis_event_log
     WHERE `case:concept:name` IS NOT NULL
-  AND TRIM(`case:concept:name`) <> ''
-  AND UPPER(TRIM(`case:concept:name`))
-      NOT IN ('NA', 'N/A', 'NAN', 'NULL', 'NONE')
-  AND `time:timestamp` IS NOT NULL
-    GROUP BY `case:concept:name`
+      AND TRIM(`case:concept:name`) <> ''
+      AND UPPER(TRIM(`case:concept:name`))
+          NOT IN ('NA', 'N/A', 'NAN', 'NULL', 'NONE')
+      AND `time:timestamp` IS NOT NULL
+    GROUP BY TRIM(`case:concept:name`)
 ) AS case_durations;
+
 
 
 -- ============================================================

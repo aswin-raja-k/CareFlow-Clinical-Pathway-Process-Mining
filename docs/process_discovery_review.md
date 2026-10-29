@@ -254,7 +254,7 @@ The prepared event log at `outputs/prepared_sepsis_event_log.csv` was inspected 
 - Missing timestamps: 0
 - Repeated case/activity/timestamp groups in prepared data: 0
 
-The prepared dataset contains 31 fewer rows than the raw event log. The exact reconciliation of those removed rows against the agreed preparation rules remains to be verified.
+The prepared dataset contains 31 fewer rows than the raw event log. Local verification reconciled this difference: 24 rows had missing case IDs, and 7 rows were removed as duplicate combinations of case ID, activity and timestamp. No rows had missing activity names or invalid timestamps. The team must still confirm agreement on these preparation rules.
 
 ### Process discovery execution
 
@@ -277,7 +277,7 @@ The dataset documentation states that timestamps were randomized while preservin
 
 ### Next steps
 
-- Reconcile the 31-row difference against the agreed preparation rules.
+- Obtain team review of the verified row-count reconciliation and confirm agreement on the preparation rules.
 - Review discovered paths and process variants.
 - Compare SQL and Python results only after confirming equivalent filtering rules and KPI definitions.
 - Keep generated outputs and raw/prepared data separate from source files; do not commit `sepsis_event_log.csv` or `outputs/prepared_sepsis_event_log.csv`.

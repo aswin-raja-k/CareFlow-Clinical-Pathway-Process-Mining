@@ -336,3 +336,37 @@ The MySQL validation query grouped records by case ID, activity name, and timest
 The CSV review identified one exact duplicate full row when the exported index column was excluded from comparison. These results use different definitions: the full-row check compares all data fields, while the grouped check compares only case ID, activity, and timestamp. Therefore, the counts are not directly equivalent.
 
 The original CSV and database records were not deleted or modified during this validation. The exact-duplicate count should be confirmed against the same database table and column set before final approval.
+
+
+
+
+### 11.5 Raw and Prepared Event Log Reconciliation
+
+The current SQL evidence reports 15,214 rows in both `sepsis_raw_import` and `sepsis_event_log`. However, the reported 31-row difference between the raw and prepared event logs has not yet been explained.
+
+Matching row counts alone do not prove that the records in both tables are identical. A row-level comparison is required to identify any missing, additional, or changed records.
+
+The one exact duplicate full row and the seven repeated case/activity/timestamp groups do not, by themselves, explain the reported 31-row difference.
+
+**Pending validation:**
+1. Compare the raw and prepared event records using consistent case-ID validation rules.
+2. Identify missing, additional, or changed records through a row-level comparison.
+3. Record the actual SQL query results and supporting evidence.
+4. Update this section only after the comparison results are available.
+
+**Current status:** The 31-row difference remains unresolved. No original CSV files were modified, and no records were deleted.
+
+### 11.6 Final Validation Status
+
+- Total rows reported in each SQL table: 15,214.
+- Invalid case-ID rows: 24 in each table.
+- Distinct valid case IDs: 1,049 in each table.
+- Valid case-ID rows: 15,190 in each table, calculated as 15,214 minus 24.
+- Repeated case/activity/timestamp groups: 7 groups affecting 14 rows, with 7 extra occurrences.
+- Exact duplicate full-row finding: 1 extra occurrence in the CSV review when the exported index column is excluded. Equivalence with the SQL duplicate check remains unverified.
+- Timestamp limitation: The timestamps were reported as randomized, so successful parsing does not establish actual clinical chronology.
+- Raw-versus-prepared reconciliation: Pending row-level verification.
+
+**Conclusion:** The current evidence documents the reported validation counts, but the duplicate comparison and 31-row reconciliation still require verification. Keep Issue #11 open until the evidence has been reviewed and approved by the team lead.
+
+**Data protection:** Do not modify the original dataset, delete records, or commit raw or prepared CSV files. Do not merge these changes into `main` before approval.

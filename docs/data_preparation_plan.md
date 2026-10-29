@@ -142,3 +142,4 @@ Any existing team-reported row counts must be labeled as team-reported until con
 ## 9. Review Status
 
 **Status:** Proposed plan — pending team review.
+Issue #9 must remain open until the review is approved.

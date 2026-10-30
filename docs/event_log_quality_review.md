@@ -370,3 +370,18 @@ The one exact duplicate full row and the seven repeated case/activity/timestamp 
 **Conclusion:** The current evidence documents the reported validation counts, but the duplicate comparison and 31-row reconciliation still require verification. Keep Issue #11 open until the evidence has been reviewed and approved by the team lead.
 
 **Data protection:** Do not modify the original dataset, delete records, or commit raw or prepared CSV files. Do not merge these changes into `main` before approval.
+
+
+
+### Case, Activity, and Timestamp Group Reconciliation
+
+A grouped comparison of the raw and prepared event logs was performed using case ID, activity name, and timestamp.
+
+- Raw table rows: 15,214
+- Prepared table rows: 15,214
+- Total event groups: 15,207
+- Mismatched groups: 0
+
+All event groups had matching occurrence counts between the raw and prepared tables. This confirms consistency of event-group counts, but does not establish complete row-level equality of every attribute.
+
+No source records were modified or deleted. The previously identified 31-row discrepancy remains unresolved pending further row-level verification.

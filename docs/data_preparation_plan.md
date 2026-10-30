@@ -13,9 +13,10 @@ The goal is to prepare a reliable event log while preserving the original datase
 - **Dataset:** Sepsis Cases - Event Log
 - **Creator:** Felix Mannhardt
 - **Publisher:** 4TU.ResearchData
-- **Official source:** https://data.4tu.nl/articles/_/12707639/1
+- **Official source:** [https://data.4tu.nl/articles/_/12707639/1](https://data.4tu.nl/articles/_/12707639/1)
 - **DOI:** 10.4121/uuid:915d2bfb-7e84-49ad-a286-dc35f063a460
 - **Licence:** 4TU General Terms of Use
+- **Redistribution details:** Refer to the applicable 4TU General Terms of Use and the dataset documentation in `data_dictionary.md`. Redistribution must follow the stated terms.
 
 ## 3. Preparation Principles
 
@@ -26,6 +27,8 @@ The goal is to prepare a reliable event log while preserving the original datase
 5. Keep original values available for traceability.
 6. Do not assume that repeated events are errors.
 7. Mark unverified counts and decisions clearly.
+8. Apply only preparation rules approved by the team.
+9. Maintain a record of the preparation procedure so the results can be reproduced.
 
 ## 4. Proposed Data Preparation Rules
 
@@ -39,6 +42,7 @@ The case identifier is `case:concept:name`.
 - Flag records with missing or invalid case IDs for investigation.
 - Exclude invalid case IDs from the prepared event log only after the team approves the rule.
 - Record the number of affected rows.
+- Preserve the original records for traceability.
 
 ### 4.2 Duplicate Handling
 
@@ -51,6 +55,7 @@ Rows are exact duplicates when every column has the same value.
 - Identify exact duplicate rows.
 - Count them separately.
 - Remove them from the working copy only if the team approves.
+- Record the number of rows removed and the reason.
 - Preserve the original raw data.
 
 **Repeated case/activity/timestamp combinations**
@@ -61,6 +66,7 @@ Rows may share the same `case:concept:name`, `concept:name`, and `time:timestamp
 - Do not automatically delete them.
 - Investigate the other field values and event meaning.
 - Retain legitimate repeated events unless the team defines a justified removal rule.
+- Document the investigation and the final decision.
 
 ### 4.3 Timestamp Validation
 
@@ -92,16 +98,16 @@ The activity field is `concept:name`.
 The following checkpoints are proposed. Row counts must be populated from actual execution of the preparation process.
 
 | Stage | Validation | Expected Row Count | Status |
-|---|---|---:|---|
+|---|---|---|---|
 | 0 | Original CSV row count | Not independently verified | Pending |
-| 1 | After checking missing/invalid case IDs | Not independently verified | Pending |
+| 1 | After identifying missing/invalid case IDs | Not independently verified | Pending |
 | 2 | After identifying exact duplicate rows | Not independently verified | Pending |
-| 3 | After applying approved exact-duplicate rule | Not independently verified | Pending |
+| 3 | After applying the approved case ID and exact-duplicate rules | Not independently verified | Pending |
 | 4 | After timestamp validation | Not independently verified | Pending |
 | 5 | After activity-name validation | Not independently verified | Pending |
 | 6 | Final prepared event log | Not independently verified | Pending |
 
-**Note:** These checkpoints are a proposed validation plan, not reported execution results. Do not fill in row counts based on estimates.
+**Note:** These checkpoints are a proposed validation plan, not reported execution results. Do not fill in row counts based on estimates. Identification and removal are separate steps; a record must not be removed unless the team-approved rule supports it.
 
 ## 6. Existing Dataset Findings
 
@@ -115,9 +121,18 @@ The following schema findings have been checked against the available CSV header
   - `concept:name`
   - `time:timestamp`
 
-The number of rows at each preparation stage has not yet been independently verified for this plan.
+The following data quality counts have been reported by the team and are **pending independent verification**:
 
-Any existing team-reported row counts must be labeled as team-reported until confirmed against the dataset and preparation procedure.
+- Raw event count: 15,214
+- Events with missing Case IDs: 24
+- Repeated Case ID, activity, and timestamp combinations: 7
+- Reported prepared event count: 15,183
+
+These figures must be checked against the actual CSV and the agreed preparation procedure before being treated as final results.
+
+The repeated event combinations must be investigated separately. They must not automatically be removed as duplicates.
+
+The number of rows at each preparation stage has not yet been independently verified for this plan.
 
 ## 7. Preparation Workflow
 
@@ -128,18 +143,36 @@ Any existing team-reported row counts must be labeled as team-reported until con
 5. Separately inspect repeated case/activity/timestamp combinations.
 6. Validate timestamp formats and within-case ordering.
 7. Inspect activity names and propose any mapping.
-8. Apply only team-approved preparation rules to a separate working copy.
-9. Record row counts and validation results at every checkpoint.
-10. Review the prepared event log with the team before use in process mining.
+8. Obtain team approval for the preparation rules.
+9. Apply only team-approved preparation rules to a separate working copy.
+10. Record row counts and validation results at every checkpoint.
+11. Preserve the original values and document any changes.
+12. Review the prepared event log with the team before use in process mining.
 
-## 8. Limitations and Review
+## 8. Reproducibility
+
+To make the preparation process reproducible:
+
+- Keep the original raw dataset unchanged.
+- Document the preparation rules and the reason for each exclusion or correction.
+- Record the row count before and after each preparation stage.
+- Record the preparation script or procedure used.
+- Use the same approved rules when repeating the preparation.
+- Keep a record of the final validation results.
+- Clearly distinguish team-reported counts from independently verified counts.
+
+## 9. Limitations and Review
 
 - Timestamp randomization may limit the interpretation of event durations and temporal patterns.
 - Repeated events may represent legitimate process behavior.
 - The proposed handling rules require team review before implementation.
 - No raw or prepared CSV files are modified by this documentation task.
+- Reported row counts must be independently verified before being treated as final.
 
-## 9. Review Status
+## 10. Review Status
 
 **Status:** Proposed plan — pending team review.
-Issue #9 must remain open until the review is approved.
+
+Issue #9 must remain open until the team reviews and approves the documentation and preparation rules.
+
+The data preparation plan documents the proposed procedure. It does not claim that the preparation process has been executed or that the final prepared event log has been independently verified.

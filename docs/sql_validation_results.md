@@ -389,3 +389,17 @@ Overall, this analysis provides a data-validation and SQL-analysis foundation fo
 **Evidence:** `evidence/`  
 **Working Branch:** `srivaishnavi-sql-analysis`  
 **Report Date:** 29 October 2026
+
+## 11. Reproducibility and Maintenance Notes
+
+To maintain consistency and reliability in the CareFlow analysis, the following practices should be followed:
+
+1. Preserve the original imported dataset before performing any modifications.
+2. Apply consistent filtering conditions across all KPI queries.
+3. Use proper timestamp ordering when calculating event sequences and time intervals.
+4. Review duplicate records before deciding whether they should be removed.
+5. Maintain clear documentation of SQL queries, validation results, and calculation methods.
+6. Compare SQL execution outputs with the documented KPI values.
+7. Keep supporting screenshots organized for future verification and team review.
+
+These practices help improve data reliability, maintain consistency, and make the SQL analysis easier to understand, reproduce, and maintain.

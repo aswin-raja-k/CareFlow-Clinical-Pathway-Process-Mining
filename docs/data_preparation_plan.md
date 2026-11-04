@@ -95,19 +95,19 @@ The activity field is `concept:name`.
 
 ## 5. Validation Checkpoints
 
-The following checkpoints are proposed. Row counts must be populated from actual execution of the preparation process.
+The following row counts are based on the team's reported findings. They are expected checkpoints and remain pending independent verification against the actual CSV and team approval.
 
 | Stage | Validation | Expected Row Count | Status |
-|---|---|---|---|
-| 0 | Original CSV row count | Not independently verified | Pending |
-| 1 | After identifying missing/invalid case IDs | Not independently verified | Pending |
-| 2 | After identifying exact duplicate rows | Not independently verified | Pending |
-| 3 | After applying the approved case ID and exact-duplicate rules | Not independently verified | Pending |
-| 4 | After timestamp validation | Not independently verified | Pending |
-| 5 | After activity-name validation | Not independently verified | Pending |
-| 6 | Final prepared event log | Not independently verified | Pending |
+|---|---|---:|---|
+| 0 | Original CSV row count | 15,214 | Team-reported; verification pending |
+| 1 | After excluding 24 records with missing Case IDs | 15,190 | Team-reported; verification pending |
+| 2 | After removing 7 repeated Case ID, activity, and timestamp combinations | 15,183 | Team-reported; verification and team approval pending |
+| 3 | Exact duplicate row validation | To be determined | Pending |
+| 4 | Timestamp validation | To be determined | Pending |
+| 5 | Activity-name validation | To be determined | Pending |
+| 6 | Final prepared event log | To be determined | Pending |
 
-**Note:** These checkpoints are a proposed validation plan, not reported execution results. Do not fill in row counts based on estimates. Identification and removal are separate steps; a record must not be removed unless the team-approved rule supports it.
+**Important:** The reported counts are not independently verified results. Exact duplicate rows must be distinguished from repeated Case ID/activity/timestamp combinations. The removal of repeated combinations must follow team approval. All preparation stages must be validated using the actual CSV and a reproducible procedure.
 
 ## 6. Existing Dataset Findings
 

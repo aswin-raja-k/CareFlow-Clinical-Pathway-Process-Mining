@@ -10,7 +10,7 @@
 **Report File:** `docs/sql_validation_results.md`  
 **Evidence Folder:** `evidence/`  
 **Working Branch:** `srivaishnavi-sql-analysis`  
-**Report Date:** 29 October 2026
+**Report Date:** 04 November 2026
 
 ---
 
@@ -27,10 +27,12 @@ The major activities covered in this analysis include:
 3. Examining missing timestamps and duplicate entries.
 4. Applying consistent filtering conditions to KPI queries.
 5. Calculating five process-related KPIs.
-6. Maintaining screenshots and SQL execution evidence.
-7. Preparing the analysis documentation for team review.
+6. Executing all five KPI queries in MySQL Workbench.
+7. Recording actual SQL execution outputs.
+8. Maintaining screenshots and SQL execution evidence.
+9. Preparing the analysis documentation for final team review.
 
-The report records the available validation findings, KPI results, and areas that still require final verification.
+This report documents the recorded validation findings, successfully executed KPI results, supporting evidence requirements, and remaining verification activities.
 
 ## 2. Dataset Information and Validation
 
@@ -100,7 +102,7 @@ The following conditions are considered:
 - KPI 3 requires timestamps to calculate the difference between consecutive activities.
 - Records without usable timestamps must not contribute to these time-based calculations.
 
-Although no missing timestamps were recorded in the validation results, the original timestamp format, timezone information, and data interpretation should also be considered.
+No missing timestamps were recorded in the validation results. However, the original timestamp format, timezone information, and data interpretation should also be considered.
 
 ## 3. Duplicate Record Examination
 
@@ -125,7 +127,7 @@ Five KPIs were selected to understand the structure and execution of the clinica
 
 The calculations cover event frequency, case duration, consecutive-event intervals, repeated activities, and cases containing the `Return ER` activity.
 
-The following values are the previously recorded results and require reconciliation with the successful MySQL Workbench screenshots before final confirmation.
+All five KPI queries were executed successfully in MySQL Workbench on 04 November 2026. The results below represent the actual outputs shared from the SQL execution.
 
 ### 4.1 KPI 1 – Average Events per Case
 
@@ -143,7 +145,11 @@ Average Events per Case = Total Valid Events / Total Valid Cases
 
 **Result Analysis:**
 
-The calculated average is approximately 14.48 events per case. This indicates the average number of recorded activities associated with each valid case in the dataset.
+The calculated average is 14.4805 events per case.
+
+This indicates the average number of recorded activities associated with each valid case in the dataset.
+
+**Verification Status:** Executed successfully. Actual output: `14.4805`.
 
 ### 4.2 KPI 2 – Average Case Duration
 
@@ -165,11 +171,11 @@ Valid case identifiers are normalized using `TRIM()`, and records with missing t
 
 **Result Analysis:**
 
-The recorded average case duration is approximately 28.48 days.
+The actual SQL output is 41,017.73047 minutes, which is approximately 683.63 hours or 28.48 days.
 
 This value represents the difference between the earliest and latest stored timestamps for each case. It should not automatically be considered the actual patient treatment duration because the validity and meaning of the timestamps must first be established.
 
-**Verification:** The successful KPI 2 execution screenshot must be checked to ensure that it contains the calculated result rather than the earlier `ONLY_FULL_GROUP_BY` error.
+**Verification Status:** Executed successfully. Actual output: `41017.73047`.
 
 ### 4.3 KPI 3 – Average Time Between Consecutive Events
 
@@ -191,9 +197,11 @@ The first event in each case does not have a preceding event, so it is excluded 
 
 **Result Analysis:**
 
-The previously recorded average interval is approximately 50.71 hours.
+The actual SQL output is 3,042.75506 minutes, approximately 50.71 hours.
 
 It represents the average difference between consecutive event timestamps. It should be interpreted as a timestamp-based measurement rather than a confirmed clinical waiting-time value.
+
+**Verification Status:** Executed successfully. Actual output: `3042.75506`.
 
 ### 4.4 KPI 4 – Cases Containing Repeated Activities
 
@@ -211,9 +219,13 @@ Percentage = (Repeated Activity Cases / Total Valid Cases) × 100
 
 **Result Analysis:**
 
-The analysis indicates that 743 cases contain repeated activities, accounting for approximately 70.83% of valid cases.
+The SQL execution returned 743 cases containing repeated activities out of 1,049 valid cases.
+
+The percentage is 70.83%.
 
 These repetitions can represent recurring clinical activities, repeated assessments, or other workflow patterns. Their presence alone does not indicate an error or unnecessary process step.
+
+**Verification Status:** Executed successfully. Actual output: `743`, `1049`, `70.83`.
 
 ### 4.5 KPI 5 – Cases Containing Return ER Activity
 
@@ -231,25 +243,31 @@ Percentage = (Cases Containing Return ER / Total Valid Cases) × 100
 
 **Result Analysis:**
 
-A total of 294 valid cases contain the `Return ER` activity, representing approximately 28.03% of all valid cases.
+The SQL execution returned 294 valid cases containing the `Return ER` activity out of 1,049 valid cases.
+
+The percentage is 28.03%.
 
 This KPI identifies the occurrence of a particular activity in the event log. It should not be directly interpreted as a clinical readmission rate or an indication of patient outcomes.
 
+**Verification Status:** Executed successfully. Actual output: `294`, `1049`, `28.03`.
+
 ## 5. Consolidated KPI Results
 
-The following table provides an overview of all five previously recorded KPI results.
+The following table provides the final KPI results obtained through MySQL Workbench execution on 04 November 2026.
 
-| No. | Key Performance Indicator | Recorded Result |
-|---|---|---:|
-| 1 | Average events per case | 14.4805 |
-| 2 | Average case duration | 41,017.73047 minutes |
-| 3 | Average time between events | 3,042.75506 minutes |
-| 4 | Cases with repeated activities | 743 (70.83%) |
-| 5 | Cases containing Return ER | 294 (28.03%) |
+| No. | Key Performance Indicator | Actual SQL Output | Status |
+|---|---|---:|---|
+| 1 | Average events per case | 14.4805 | Verified |
+| 2 | Average case duration | 41,017.73047 minutes | Verified |
+| 3 | Average time between events | 3,042.75506 minutes | Verified |
+| 4 | Cases with repeated activities | 743 (70.83%) | Verified |
+| 5 | Cases containing Return ER | 294 (28.03%) | Verified |
 
-The intended common population for these KPIs is 1,049 valid cases, containing 15,190 valid event records.
+The common analysis population consists of 1,049 valid cases containing 15,190 valid event records.
 
-The reported results should be compared with the corresponding successful SQL execution outputs before final approval.
+All five KPI outputs were successfully returned by their respective SQL queries.
+
+The current results match the previously recorded KPI values.
 
 ## 6. SQL Implementation Details
 
@@ -277,7 +295,7 @@ The implementation is maintained on the feature branch `srivaishnavi-sql-analysi
 
 ## 7. Supporting Evidence
 
-Screenshots of the validation and KPI execution outputs are organized in the `evidence/` directory.
+Screenshots of the validation and KPI execution outputs are maintained in the `evidence/` directory.
 
 | File Name | Purpose |
 |---|---|
@@ -291,79 +309,118 @@ Screenshots of the validation and KPI execution outputs are organized in the `ev
 | `08_kpi_repeated_activities.png` | Fourth KPI execution |
 | `09_kpi_return_er.png` | Fifth KPI execution |
 
-These screenshots provide supporting material for reviewing the SQL validation and KPI calculations.
+The five KPI outputs have been successfully obtained through MySQL Workbench execution.
 
-The following checks are necessary before considering the evidence complete:
+The following evidence-related activities remain necessary:
 
-- Verify that all five screenshots show successful query executions.
-- Compare each displayed KPI result with this report.
-- Confirm that KPI 2 does not contain the earlier SQL execution error.
-- Ensure that the screenshots correspond to the current SQL implementation.
-- Replace incorrect or unsuccessful screenshots when necessary.
-- Retain valid existing evidence.
+- Capture and save the five actual KPI execution screenshots.
+- Ensure each screenshot displays the successful query output.
+- Compare the screenshots with the corresponding KPI values in this report.
+- Confirm that KPI 2 displays the calculated result rather than the earlier `ONLY_FULL_GROUP_BY` error.
+- Ensure the screenshots correspond to the current SQL implementation.
+- Retain valid existing validation screenshots.
 
-## 8. Work Verification Status
+The screenshot filenames listed above are the intended evidence organization. Their presence in the repository must be confirmed before marking the evidence section complete.
 
-The following table separates recorded completed activities from items that still require confirmation.
+## 8. Database Table Structure Sharing
+
+As part of the final SQL verification task, the column details of both database tables must be shared with Prasuna.
+
+The following commands are used to retrieve the table structures:
+
+```sql
+USE careflow;
+
+DESCRIBE sepsis_raw_import;
+
+DESCRIBE sepsis_event_log;
+```
+
+The `DESCRIBE` command provides the following information:
+
+- Column names
+- Data types
+- NULL permissions
+- Key information
+- Default values
+- Extra attributes
+
+The two table structures provide information about the original imported dataset and the structured event log used for analysis.
+
+**Sharing Status:** Pending confirmation.
+
+The column details should be shared with Prasuna through the team's usual communication channel or the relevant GitHub discussion.
+
+## 9. Work Verification Status
+
+The following table separates completed activities from the remaining tasks for Issue #10.
 
 | Activity | Current Status |
 |---|---|
-| Source and destination row-count validation | Recorded as completed |
-| Invalid case-ID identification | Recorded as completed |
+| Source and destination row-count validation | Previously verified |
+| Invalid case-ID identification | Previously verified |
 | Common filtering conditions | Documented in SQL |
-| Five KPI queries | Reported as executed |
-| KPI values compared with screenshots | Requires confirmation |
-| Successful KPI 2 screenshot | Requires confirmation |
-| Final SQL report review | Pending final review |
-| Git commit and push | Requires confirmation |
+| KPI 1 execution | Verified |
+| KPI 2 execution | Verified |
+| KPI 3 execution | Verified |
+| KPI 4 execution | Verified |
+| KPI 5 execution | Verified |
+| KPI outputs recorded in report | Updated |
+| Five KPI screenshots | Pending capture/confirmation |
+| Screenshot and report reconciliation | Pending |
+| Database table structure retrieval | Pending |
+| Table details shared with Prasuna | Pending |
+| Final SQL report review | Pending |
+| Git commit and push | Pending |
+| Issue #10 review | Pending |
 
-The final report should be considered complete only after the execution evidence and recorded results have been reconciled.
+The final report should be considered complete only after the remaining evidence, communication, and repository activities have been completed.
 
-## 9. Limitations and Important Considerations
+## 10. Limitations and Important Considerations
 
-### 9.1 Timestamp Reliability
+### 10.1 Timestamp Reliability
 
 The dataset timestamps may have been randomized or modified. Consequently, calculated durations and event intervals represent the stored timestamp values.
 
 They should not be treated as actual clinical durations or waiting times without confirming the original timestamp information.
 
-### 9.2 Invalid Case Identifiers
+### 10.2 Invalid Case Identifiers
 
 The 24 records associated with the placeholder value `NA` are excluded from valid-case analysis.
 
 This avoids grouping unrelated records under a single invalid identifier.
 
-### 9.3 Duplicate Records
+### 10.3 Duplicate Records
 
 One duplicate group with one additional matching record was identified.
 
 The record remains documented for investigation rather than being automatically deleted.
 
-### 9.4 Consistency of KPI Calculations
+### 10.4 Consistency of KPI Calculations
 
 All five KPI queries should follow the same invalid case-ID filtering rules.
 
 Any differences in filtering, grouping, or timestamp handling may affect the final results.
 
-### 9.5 Evidence Verification
+### 10.5 Evidence Verification
 
 The values in the report must correspond to successful MySQL Workbench outputs.
 
-Previously recorded values should not be described as newly verified unless the relevant execution evidence has been checked.
+The five KPI queries have returned the expected results. However, the corresponding screenshots must be saved and checked before the evidence submission is considered complete.
 
-### 9.6 Python Result Comparison
+### 10.6 Python Result Comparison
 
 This report does not include a comparison with the existing synthetic Python KPI results.
 
 A comparison should only be performed when both implementations use the same dataset, filtering conditions, timestamp handling, and calculation definitions.
 
-### 9.7 Clinical Interpretation
+### 10.7 Clinical Interpretation
 
 Repeated activities and `Return ER` occurrences are descriptive process indicators.
 
 Additional clinical information is required before using these measurements to draw conclusions about treatment quality, process inefficiency, readmission, or patient outcomes.
 
-## 10. Final Summary
+## 11. Final Summary
 
 The CareFlow Sepsis event log analysis was performed using MySQL and the `careflow` database.
 
@@ -371,11 +428,23 @@ The validation results recorded 15,214 source records and 15,214 destination rec
 
 After excluding these records, the analysis population consisted of 15,190 events and 1,049 valid cases.
 
-Five KPIs were included to examine event frequency, case duration, intervals between consecutive activities, repeated activities, and the occurrence of `Return ER`.
+Five KPIs were successfully executed in MySQL Workbench on 04 November 2026.
 
-The SQL implementation maintains common case-ID filtering conditions, while the supporting screenshots provide evidence of the validation and KPI calculations.
+The final results are:
 
-Final reconciliation of the recorded results with the successful MySQL Workbench screenshots and completion of the repository checks remain necessary.
+1. Average events per case: 14.4805.
+2. Average case duration: 41,017.73047 minutes.
+3. Average time between events: 3,042.75506 minutes.
+4. Cases with repeated activities: 743 (70.83%).
+5. Cases containing Return ER: 294 (28.03%).
+
+All five outputs match the previously recorded KPI values.
+
+The SQL implementation maintains common case-ID filtering conditions, while the supporting screenshots are intended to provide evidence of the validation and KPI calculations.
+
+The remaining activities include capturing and confirming the five KPI screenshots, sharing the database table structures with Prasuna, completing the final report review, and committing and pushing the changes to the working branch.
+
+Issue #10 will remain open until the results are reviewed. No changes will be merged into `main` as part of this task.
 
 Overall, this analysis provides a data-validation and SQL-analysis foundation for the CareFlow clinical process-mining workflow, with appropriate consideration of timestamp reliability, duplicate records, and interpretation limitations.
 
@@ -388,9 +457,9 @@ Overall, this analysis provides a data-validation and SQL-analysis foundation fo
 **Documentation:** `docs/sql_validation_results.md`  
 **Evidence:** `evidence/`  
 **Working Branch:** `srivaishnavi-sql-analysis`  
-**Report Date:** 29 October 2026
+**Report Date:** 04 November 2026
 
-## 11. Reproducibility and Maintenance Notes
+## 12. Reproducibility and Maintenance Notes
 
 To maintain consistency and reliability in the CareFlow analysis, the following practices should be followed:
 
@@ -400,6 +469,9 @@ To maintain consistency and reliability in the CareFlow analysis, the following 
 4. Review duplicate records before deciding whether they should be removed.
 5. Maintain clear documentation of SQL queries, validation results, and calculation methods.
 6. Compare SQL execution outputs with the documented KPI values.
-7. Keep supporting screenshots organized for future verification and team review.
+7. Maintain screenshots of successful SQL executions.
+8. Share database table structures with relevant team members.
+9. Commit and push the completed changes to the designated feature branch.
+10. Keep Issue #10 open until the final results are reviewed.
 
 These practices help improve data reliability, maintain consistency, and make the SQL analysis easier to understand, reproduce, and maintain.

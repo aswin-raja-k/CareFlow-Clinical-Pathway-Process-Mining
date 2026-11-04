@@ -283,3 +283,128 @@ The dataset documentation states that timestamps were randomized while preservin
 - Keep generated outputs and raw/prepared data separate from source files; do not commit `sepsis_event_log.csv` or `outputs/prepared_sepsis_event_log.csv`.
 
 **Status:** Actual-dataset process discovery executed successfully; preparation reconciliation and team validation remain pending.
+
+## 13. Team Reconciliation Review — 4 November 2026
+
+### 13.1 Dataset Preparation — Poojitha
+
+The latest reviewed branch contains an updated data preparation plan and data dictionary.
+
+Key documented findings:
+
+- Source records: 15,214
+- Missing case IDs: 24
+- Distinct valid cases: 1,049
+- Distinct activities: 16
+- Repeated case/activity/timestamp combinations: 7 groups
+- Exact duplicate full rows: 0 when comparing all 33 columns, including the export index
+
+Prasuna's review identifies one additional exact duplicate occurrence when comparing the 32 substantive columns and excluding the export index. These results use different comparison definitions and must not be treated as contradictory without considering the columns used.
+
+The preparation plan proposes excluding the 24 invalid case-ID records and removing seven extra occurrences of repeated process-field combinations. These remain proposed preparation rules pending team agreement.
+
+**Required follow-up:**
+- Confirm the preparation rules with the team.
+- Independently verify the reported quality counts.
+- Confirm the official dataset source and redistribution terms before sharing the raw dataset.
+- Retain the distinction between exact full-row duplicates and repeated process-field combinations.
+
+**Status:** Documentation reviewed; final preparation approval pending.
+
+### 13.2 Data Validation — Prasuna
+
+The latest reviewed validation report records:
+
+- Source rows: 15,214
+- Missing case IDs: 24
+- Valid case IDs: 1,049
+- Exact duplicate full rows, excluding the export index: one additional occurrence
+- Repeated case/activity/timestamp combinations: 7 groups affecting 14 rows
+- Missing activity names: 0
+- Missing timestamps: 0
+
+The SQL reconciliation reports 15,214 rows in both the raw and destination tables. It also reports 15,207 event-key groups with no mismatched group counts.
+
+Matching event-key group counts do not prove that all event attributes match between the tables.
+
+The difference between the SQL analysis population of 15,190 events and the Python-prepared population of 15,183 events remains to be reconciled at row level.
+
+**Required follow-up:**
+- Verify the SQL column mapping and comparison definitions.
+- Perform a row-level comparison using consistent preparation rules.
+- Confirm whether the seven repeated event-key occurrences are handled identically in SQL and Python.
+
+**Status:** Validation evidence reviewed; row-level reconciliation pending.
+
+### 13.3 SQL Analysis — Srivaishnavi
+
+The latest reviewed SQL report documents five KPI results:
+
+| KPI | Recorded SQL result |
+|---|---:|
+| Average events per case | 14.4805 |
+| Average case duration | 41,017.73047 minutes |
+| Average time between events | 3,042.75506 minutes |
+| Cases with repeated activities | 743 (70.83%) |
+| Cases containing Return ER | 294 (28.03%) |
+
+The latest SQL script applies the invalid case-ID exclusions consistently across the five KPI queries, including KPI 2 and KPI 3. This supersedes the earlier filtering concern recorded in section 11.
+
+The SQL queries use the 15,190-event population after excluding 24 invalid case-ID records. They do not apply the additional seven-occurrence deduplication used in the Python-prepared event log.
+
+The duration and interval results are based on stored timestamps. They must not be presented as confirmed clinical durations or waiting times because timestamp reliability remains uncertain.
+
+**Required follow-up:**
+- Share the database schemas for `sepsis_raw_import` and `sepsis_event_log`.
+- Confirm the timestamp column data type and stored format.
+- Confirm the five KPI screenshots match the current SQL queries and report values.
+- Reconcile SQL and Python results only after agreeing on identical preparation rules and analysis populations.
+
+**Status:** SQL script and reported KPI outputs reviewed; database schema and timestamp verification pending.
+
+### 13.4 Row-Count Reconciliation
+
+The current preparation counts can be expressed as:
+
+| Stage | Records |
+|---|---:|
+| Original source dataset | 15,214 |
+| After excluding 24 invalid case-ID records | 15,190 |
+| After removing 7 extra repeated process-field occurrences | 15,183 |
+
+The Python-prepared event log contains 15,183 events, while the SQL KPI analysis uses 15,190 events.
+
+The difference of seven records is consistent with the additional deduplication step in the Python workflow. However, final reconciliation requires confirmation that both implementations use the same source rows, event-key definitions and preparation rules.
+
+The one exact duplicate full-row occurrence is a separate comparison result and must not be added to the seven removed occurrences without checking for overlap.
+
+**Decision:** Do not declare SQL and Python results fully reconciled yet.
+
+### 13.5 Team Decisions and Outstanding Tasks
+
+1. Review and approve the proposed preparation and deduplication rules as a team.
+2. Complete row-level reconciliation between the SQL and Python analysis populations.
+3. Verify the SQL database schema and timestamp field.
+4. Confirm KPI execution screenshots against the latest SQL queries.
+5. Review dataset source and redistribution terms.
+6. Review process-tree paths using the agreed prepared event log.
+7. Complete the team review before any branch is merged into `main`.
+
+### 13.6 Next-Day Task — SQL Schema Verification
+
+**Assigned to:** Srivaishnavi
+**Task:** Share the database structures of `sepsis_raw_import` and `sepsis_event_log`, including column names and data types.
+
+The outputs should be shared with Prasuna and the team to support schema mapping and timestamp verification.
+
+### 13.7 Integration Decision
+
+No team branch is approved for merging at this stage.
+
+The team has reviewed the latest documentation, validation findings, SQL implementation and KPI results. However, preparation-rule approval, row-level reconciliation, database schema verification and final evidence checks remain outstanding.
+
+The raw source dataset and local prepared event log must remain uncommitted.
+
+**Status:** Team review updated on 4 November 2026; final reconciliation and integration pending.
+
+**Review branch:** `aswin-process-mining-dashboard`

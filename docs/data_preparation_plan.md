@@ -176,3 +176,33 @@ To make the preparation process reproducible:
 Issue #9 must remain open until the team reviews and approves the documentation and preparation rules.
 
 The data preparation plan documents the proposed procedure. It does not claim that the preparation process has been executed or that the final prepared event log has been independently verified.
+
+## Excel-Based Data Quality Verification
+
+The Sepsis Cases – Event Log dataset was reviewed using Microsoft Excel.
+
+### Verification Results
+
+| Check | Result |
+|---|---:|
+| Original data rows | 15,214 |
+| Total CSV columns | 33 |
+| Substantive dataset columns | 32 |
+| Blank Case IDs | 0 |
+| Case IDs containing literal `NA` | 24 |
+| Exact duplicate rows | 0 |
+| Repeated Case ID + Activity + Timestamp occurrences | 7 |
+
+### Proposed Cleaning Checkpoints
+
+- Original records: 15,214
+- After proposed review and exclusion of 24 `NA` Case ID records: 15,190
+- After proposed removal of 7 extra repeated event-key occurrences: 15,183
+
+### Cleaning Status
+
+No records have been deleted. The original dataset remains unchanged. The 24 `NA` Case ID records and 7 extra repeated event-key occurrences are documented separately and are pending team approval before cleaning.
+
+### Evidence
+
+An Excel validation workbook contains the header verification, data-quality summary, `NA` Case ID review, repeated event-key review, and cleaning decision log.

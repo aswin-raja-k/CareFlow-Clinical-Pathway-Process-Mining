@@ -1,0 +1,208 @@
+[1mdiff --git a/docs/sql_validation_results.md b/docs/sql_validation_results.md[m
+[1mindex f0950d2..9af74e9 100644[m
+[1m--- a/docs/sql_validation_results.md[m
+[1m+++ b/docs/sql_validation_results.md[m
+[36m@@ -3,7 +3,9 @@[m
+ [m
+ ### 1. Objective[m
+ [m
+[31m-The objective of this task was to analyze the Sepsis event log using MySQL, validate data quality, calculate key performance indicators (KPIs), and identify patterns in clinical pathway activities.[m
+[32m+[m[32mThe objective of this task was to validate the Sepsis event log using MySQL, investigate data-quality issues, calculate key performance indicators (KPIs), and analyze clinical pathway activity patterns.[m
+[32m+[m
+[32m+[m[32mThe analysis also addressed a discrepancy between SQL and Python results caused by the treatment of the literal value `NA` in case identifiers.[m
+ [m
+ ### 2. Tools and Technologies[m
+ [m
+[36m@@ -11,28 +13,38 @@[m [mThe objective of this task was to analyze the Sepsis event log using MySQL, vali[m
+ - **SQL Editor:** MySQL Workbench[m
+ - **Dataset:** Sepsis Event Log[m
+ - **Schema:** `careflow`[m
+[31m-- **Tables:** `sepsis_raw_import`, `sepsis_event_log`[m
+[32m+[m[32m- **Source table:** `sepsis_raw_import`[m
+[32m+[m[32m- **Analysis table:** `sepsis_event_log`[m
+[32m+[m[32m- **Version control:** Git and GitHub[m
+ [m
+ ### 3. Data Validation[m
+ [m
+[31m-The source dataset was compared with the destination analysis table to verify that the data was loaded correctly.[m
+[32m+[m[32mThe source dataset was compared with the destination analysis table to verify the successful loading and consistency of the records.[m
+ [m
+ | Validation check | Result |[m
+ |---|---:|[m
+ | Source rows | 15,214 |[m
+ | Destination rows | 15,214 |[m
+ | Row difference | 0 |[m
+[31m-| Unique cases | 1,050 |[m
+ | Distinct activities | 16 |[m
+[31m-| Missing case IDs | 0 |[m
+[32m+[m[32m| Invalid case identifiers (`NA`) | 24 |[m
+[32m+[m[32m| Valid distinct cases | 1,049 |[m
+[32m+[m[32m| Valid events after excluding invalid case IDs | 15,190 |[m
+ | Missing timestamps | 0 |[m
+[31m-| Overall validation status | PASS |[m
+[32m+[m[32m| Duplicate selected-column groups | 1 |[m
+[32m+[m[32m| Overall row-count validation | PASS |[m
+[32m+[m
+[32m+[m[32m**Observation:** The source and destination tables contain the same number of records. However, matching row counts alone do not guarantee that all records are suitable for process analysis.[m
+[32m+[m
+[32m+[m[32mA further investigation identified 24 records with the literal value `NA` in the case identifier field. These records were excluded from the corrected KPI calculations.[m
+ [m
+[31m-**Observation:** The source and destination tables contain the same number of records. No missing case IDs or timestamps were identified in the analysis table.[m
+[32m+[m[32mThe duplicate check identified one group of records with matching values across the selected columns. The record was retained rather than deleted without further investigation.[m
+ [m
+ ### 4. Activity Frequency Analysis[m
+ [m
+[31m-Activity frequency was calculated to understand which clinical activities occur most often in the dataset.[m
+[32m+[m[32mActivity frequency was analyzed to identify the most common clinical activities in the event log.[m
+[32m+[m
+[32m+[m[32mThe following counts represent the activity-frequency results obtained from the original event log.[m
+ [m
+ | Activity | Event count |[m
+ |---|---:|[m
+[36m@@ -52,72 +64,113 @@[m [mActivity frequency was calculated to understand which clinical activities occur[m
+ | Release C | 25 |[m
+ | Release D | 24 |[m
+ | Release E | 6 |[m
+[32m+[m[32m| **Total events** | **15,214** |[m
+[32m+[m
+[32m+[m[32m**Observation:** Leucocytes and CRP are the most frequent activities, followed by LacticAcid. Release E has the lowest event count.[m
+ [m
+[31m-**Observation:** Leucocytes and CRP are the most frequent activities, followed by LacticAcid. The release activities occur less frequently, with Release E having the lowest event count.[m
+[32m+[m[32mThese counts describe the original event log, including records that were subsequently excluded from the corrected KPI calculations because of invalid case identifiers.[m
+ [m
+ ### 5. Key Performance Indicators (KPIs)[m
+ [m
+[31m-Five KPIs were calculated using SQL queries on the Sepsis event log.[m
+[32m+[m[32mFive KPIs were calculated using SQL queries on the validated event data. The corrected calculations exclude events associated with invalid case identifiers.[m
+ [m
+[31m-| KPI | Actual result |[m
+[32m+[m[32m| KPI | Corrected result |[m
+ |---|---:|[m
+[31m-| Average events per case | 14.4895 |[m
+[31m-| Average case duration | 40,995.85138 minutes |[m
+[31m-| Average time between consecutive events | 3,039.08811 minutes |[m
+[31m-| Cases with repeated activities | 744 |[m
+[31m-| Percentage of cases with repeated activities | 70.85714% |[m
+[31m-| Cases with Return ER | 294 |[m
+[31m-| Percentage of cases with Return ER | 28.00000% |[m
+[32m+[m[32m| Average events per case | 14.4805 |[m
+[32m+[m[32m| Average case duration | 41,017.73 minutes |[m
+[32m+[m[32m| Average time between consecutive events | 3,042.76 minutes |[m
+[32m+[m[32m| Cases with repeated activities | 743 |[m
+[32m+[m[32m| Percentage of cases with repeated activities | 70.83% |[m
+[32m+[m[32m| Cases containing `Return ER` | 294 |[m
+[32m+[m[32m| Percentage of cases containing `Return ER` | 28.03% |[m
+ [m
+ #### KPI 1: Average Events per Case[m
+ [m
+[31m-**Result:** 14.4895 events per case.[m
+[32m+[m[32m**Result:** 14.4805 events per case.[m
+[32m+[m
+[32m+[m[32mThis KPI measures the average number of valid recorded events associated with each valid case.[m
+ [m
+[31m-This KPI measures the average number of recorded events associated with each case.[m
+[32m+[m[32m**Calculation:**[m
+[32m+[m
+[32m+[m[32mAverage events per case = Valid events / Valid distinct cases[m
+ [m
+ #### KPI 2: Average Case Duration[m
+ [m
+[31m-**Result:** 40,995.85138 minutes.[m
+[32m+[m[32m**Result:** 41,017.73 minutes.[m
+ [m
+ This KPI measures the average elapsed time between the first and last recorded events for each case.[m
+ [m
+[32m+[m[32m**Calculation:**[m
+[32m+[m
+[32m+[m[32mCase duration = Last event timestamp − First event timestamp[m
+[32m+[m
+[32m+[m[32mThe average is calculated across valid cases with usable timestamps. The duration represents elapsed time and should not automatically be interpreted as active treatment time.[m
+[32m+[m
+ #### KPI 3: Average Time Between Consecutive Events[m
+ [m
+[31m-**Result:** 3,039.08811 minutes.[m
+[32m+[m[32m**Result:** 3,042.76 minutes.[m
+[32m+[m
+[32m+[m[32mThis KPI measures the average time gap between consecutive events within a case.[m
+[32m+[m
+[32m+[m[32m**Calculation:**[m
+ [m
+[31m-This KPI measures the average time gap between consecutive events within a case, based on the event ordering used in the SQL query.[m
+[32m+[m[32mTime between events = Current event timestamp − Previous event timestamp[m
+[32m+[m
+[32m+[m[32mThe calculation depends on the event ordering used by the SQL query. The result represents elapsed time between recorded events, not necessarily the duration of a specific clinical activity.[m
+ [m
+ #### KPI 4: Repeated Activities[m
+ [m
+[31m-**Result:** 744 out of 1,050 cases, or 70.85714%.[m
+[32m+[m[32m**Result:** 743 out of 1,049 valid cases, or approximately 70.83%.[m
+[32m+[m
+[32m+[m[32mThis KPI identifies cases in which at least one activity occurs more than once.[m
+ [m
+[31m-This KPI identifies cases in which at least one activity occurs more than once. Repeated activities can be investigated further to understand potential rework or repeated clinical procedures.[m
+[32m+[m[32mRepeated activities may indicate rework, repeated testing, or legitimate clinical procedures. Case-level event sequences must be examined before interpreting these patterns.[m
+ [m
+ #### KPI 5: Return ER[m
+ [m
+[31m-**Result:** 294 out of 1,050 cases, or 28.00000%.[m
+[32m+[m[32m**Result:** 294 out of 1,049 valid cases, or approximately 28.03%.[m
+[32m+[m
+[32m+[m[32mThis KPI identifies valid cases containing the `Return ER` activity.[m
+ [m
+[31m-This KPI identifies cases containing a `Return ER` activity. These cases may warrant further process analysis to understand the circumstances surrounding emergency-room returns.[m
+[32m+[m[32mThese cases may warrant further investigation to understand the sequence of events preceding and following an emergency-room return.[m
+ [m
+ ### 6. Key Findings[m
+ [m
+[31m-1. The dataset contains 15,214 events across 1,050 unique cases.[m
+[31m-2. All 16 distinct activities were identified in the event log.[m
+[31m-3. The source and destination row counts match, with no missing case IDs or timestamps.[m
+[31m-4. Repeated activities were identified in 744 cases (70.85714%).[m
+[31m-5. The `Return ER` activity appears 294 times, corresponding to 28% of unique cases containing this activity.[m
+[31m-6. The activity-frequency results show that laboratory-related activities, particularly Leucocytes and CRP, occur most frequently.[m
+[32m+[m[32m1. The source and destination tables contain 15,214 rows each, with no row-count difference.[m
+[32m+[m[32m2. The event log contains 16 distinct activities.[m
+[32m+[m[32m3. Twenty-four records contain the literal value `NA` in the case identifier field and were excluded from the corrected KPI analysis.[m
+[32m+[m[32m4. The corrected analysis uses 15,190 valid events across 1,049 valid cases.[m
+[32m+[m[32m5. Repeated activities were identified in 743 cases, representing approximately 70.83% of valid cases.[m
+[32m+[m[32m6. The `Return ER` activity was found in 294 valid cases, representing approximately 28.03% of valid cases.[m
+[32m+[m[32m7. Leucocytes and CRP are the most frequent activities in the original event log.[m
+[32m+[m[32m8. One duplicate group was identified using the selected-column duplicate check and retained for further review.[m
+[32m+[m
+[32m+[m[32m### 7. Data-Quality Considerations[m
+[32m+[m
+[32m+[m[32mDuring validation, SQL and Python produced different results because the literal text `NA` was not treated consistently as a missing or invalid case identifier.[m
+[32m+[m
+[32m+[m[32mThe corrected analysis explicitly excludes invalid case identifiers before calculating case-based KPIs. This ensures that the denominators and event counts used in the analysis are consistent.[m
+[32m+[m
+[32m+[m[32mThe duplicate check was limited to the columns included in the query. Therefore, the identified group should not automatically be considered a confirmed duplicate clinical event. Further investigation using the full event record and relevant identifiers is required before removing any data.[m
+[32m+[m
+[32m+[m[32m### 8. Conclusion[m
+[32m+[m
+[32m+[m[32mSQL-based validation and KPI analysis were performed on the Sepsis event log as part of the CareFlow: Clinical Pathway Process Mining project.[m
+[32m+[m
+[32m+[m[32mThe source and destination row counts matched, and the investigation identified 24 records with invalid case identifiers. After excluding these records from the corrected KPI calculations, the analysis used 15,190 valid events across 1,049 valid cases.[m
+[32m+[m
+[32m+[m[32mThe calculated KPIs provide an initial overview of clinical activity frequency, case duration, event timing, repeated activities, and emergency-room returns. These results support further process-mining analysis to investigate clinical pathway patterns and potential bottlenecks.[m
+ [m
+[31m-These findings highlight areas for further investigation in clinical pathway process mining. Repeated activities and emergency-room returns should be examined alongside case timelines and clinical context before drawing conclusions about bottlenecks or avoidable rework.[m
+[32m+[m[32mFurther interpretation should be based on case-level event sequences, timestamp validation, and clinical context.[m
+ [m
+[31m-### 7. Conclusion[m
+[32m+[m[32m### 9. Final Validation Status[m
+ [m
+[31m-SQL-based validation and KPI analysis were completed on the Sepsis event log. The validation query returned `PASS`, confirming that the source and destination row counts match and that the checked case IDs and timestamps are complete.[m
+[32m+[m[32m**Row-count validation: PASS**[m
+ [m
+[31m-The calculated KPIs provide an initial overview of case activity, elapsed duration, event timing, repeated activities, and emergency-room returns. These results can support subsequent process-mining analysis and visualization in the CareFlow project.[m
+[32m+[m[32m**Case identifier validation: 24 invalid `NA` records identified and excluded from corrected KPI calculations.**[m
+ [m
+[31m-### 8. Validation Status[m
+[32m+[m[32m**KPI analysis: Completed using the corrected case filtering.**[m
+ [m
+[31m-**Status: SQL analysis executed and expected counts validated.**[m
+[32m+[m[32m**Duplicate review: One selected-column duplicate group identified and retained pending further investigation.**[m
+ [m
+[31m-The reported figures reflect the query outputs obtained in MySQL Workbench. Further process interpretation should be supported by reviewing case-level event sequences and timestamps.[m
+[32m+[m[32mThe report reflects the corrected SQL results obtained during the validation task. The row-count validation status should not be interpreted as confirmation that every record is free of data-quality issues.[m
+\ No newline at end of file[m

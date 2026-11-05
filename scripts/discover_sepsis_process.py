@@ -5,8 +5,8 @@ import pm4py
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SOURCE = BASE_DIR / "sepsis_event_log.csv"
-OUTPUT_DIR = BASE_DIR / "outputs"
-REPORT_DIR = BASE_DIR / "reports"
+OUTPUT_DIR = BASE_DIR / "outputs" / "run_20261105"
+REPORT_DIR = BASE_DIR / "reports" / "run_20261105"
 
 CASE = "case:concept:name"
 ACTIVITY = "concept:name"

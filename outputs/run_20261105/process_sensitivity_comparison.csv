@@ -1,0 +1,3 @@
+Scenario,Events,Cases,Activities,Unique variants,Cases with repeated activities,Extra repeated occurrences
+A - Retain repeated model rows,15190,1049,16,845,743,5610
+B - Remove repeated model rows,15183,1049,16,844,742,5603

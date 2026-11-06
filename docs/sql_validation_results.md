@@ -11,7 +11,7 @@
 **Report File:** `docs/sql_validation_results.md`  
 **Evidence Folder:** `evidence/`  
 **Working Branch:** `srivaishnavi-sql-analysis`  
-**Report Date:** 05 November 2026
+**Report Date:** 06 November 2026
 
 ---
 
@@ -173,6 +173,12 @@ One duplicate group containing one additional matching record was identified.
 The duplicate was documented instead of being automatically deleted.
 
 This is important because repeated activities may sometimes be valid events within a clinical process. Further examination of the source data is necessary before deciding whether the identified record is an actual import duplication.
+
+### 3.1 Duplicate Record Handling
+
+The identified duplicate group was retained in the dataset for further investigation.
+
+No records were deleted during this analysis because repeated clinical events may represent valid process activities. Domain-level verification is required before deciding whether a record should be removed.
 
 ---
 
@@ -361,6 +367,18 @@ The queries exclude SQL NULL values, blank identifiers, whitespace-only values, 
 For duration calculations, case identifiers are normalized before grouping. For consecutive-event analysis, activities are ordered within each case using their timestamps.
 
 The implementation is maintained on the feature branch `srivaishnavi-sql-analysis` for review before integration into the main project.
+
+### 6.1 SQL Query Maintainability
+
+The SQL analysis script is organized to improve readability, consistency, and reproducibility.
+
+- Validation queries and KPI queries are maintained separately for easier review.
+- Consistent filtering conditions are applied to exclude invalid case identifiers.
+- The `LAG()` window function is used to identify consecutive event timestamps for time-gap analysis.
+- The SQL queries are maintained in a single script, `sql/sepsis_analysis.sql`, for review and future execution.
+- Query results are documented in this report for reference and verification.
+
+These practices improve the maintainability and clarity of the SQL analysis.
 
 ---
 
@@ -617,7 +635,7 @@ Overall, this analysis provides a data-validation and SQL-analysis foundation fo
 **Documentation:** `docs/sql_validation_results.md`  
 **Evidence:** `evidence/`  
 **Working Branch:** `srivaishnavi-sql-analysis`  
-**Report Date:** 05 November 2026
+**Report Date:** 06 November 2026
 
 ---
 
@@ -638,3 +656,15 @@ To maintain consistency and reliability in the CareFlow analysis, the following 
 11. Keep Issue #10 open until the final results are reviewed.
 
 These practices help improve data reliability, maintain consistency, and make the SQL analysis easier to understand, reproduce, and maintain.
+
+---
+
+## 13. Report Revision History
+
+| Date | Updates |
+|---|---|
+| 04 November 2026 | Recorded the execution results of the five SQL KPI queries. |
+| 05 November 2026 | Updated schema observations, timestamp details, and validation documentation. |
+| 06 November 2026 | Improved report organization, clarified duplicate record handling, and added SQL query maintainability notes. |
+
+**Revision Note:** The updates made on 06 November 2026 are documentation improvements only. No new SQL validation results or KPI values were generated as part of this revision. Previously identified pending tasks and limitations remain unchanged.

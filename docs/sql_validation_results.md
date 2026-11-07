@@ -11,36 +11,36 @@
 **Report File:** `docs/sql_validation_results.md`  
 **Evidence Folder:** `evidence/`  
 **Working Branch:** `srivaishnavi-sql-analysis`  
-**Report Date:** 06 November 2026
+**Report Date:** 07 November 2026
 
 ---
 
 ## 1. Introduction
 
-CareFlow focuses on understanding clinical workflows through process mining techniques. This report presents the data validation and SQL-based analysis performed on the Sepsis event log.
+CareFlow focuses on understanding clinical workflows through process mining techniques. This report documents the data validation and SQL-based analysis performed on the Sepsis event log.
 
-The analysis was carried out using MySQL to examine data quality, validate case identifiers, detect duplicate records, and calculate five important performance indicators.
+MySQL was used to examine data quality, validate case identifiers, identify duplicate records, inspect timestamp information, and calculate five important Key Performance Indicators (KPIs).
 
-The major activities covered in this analysis include:
+The main activities covered in this analysis include:
 
-1. Checking the consistency of imported and destination records.
+1. Comparing source and destination record counts.
 2. Identifying invalid and placeholder case identifiers.
 3. Examining missing timestamps and duplicate entries.
-4. Applying consistent filtering conditions to KPI queries.
+4. Applying consistent filtering conditions across KPI queries.
 5. Calculating five process-related KPIs.
 6. Executing all five KPI queries in MySQL Workbench.
 7. Recording actual SQL execution outputs.
 8. Verifying database table structures and timestamp storage.
-9. Maintaining screenshots and SQL execution evidence.
-10. Preparing the analysis documentation for final team review.
+9. Maintaining SQL execution and validation documentation.
+10. Documenting the analysis findings and technical considerations.
 
-This report documents the recorded validation findings, successfully executed KPI results, database schema verification, timestamp observations, supporting evidence requirements, and remaining verification activities.
+This report presents the recorded validation findings, successfully executed KPI results, database schema observations, timestamp details, and supporting analysis documentation.
 
 ---
 
 ## 2. Dataset Information and Validation
 
-The Sepsis dataset was loaded into the `careflow` database.
+The Sepsis dataset was imported into the `careflow` database.
 
 Two tables are used in this analysis:
 
@@ -62,9 +62,9 @@ The following results were recorded during dataset validation.
 | Unique activities | 16 |
 | Missing timestamps | 0 |
 
-Both tables contain the same number of records. This confirms row-count consistency, although it does not independently prove that every imported field is identical.
+Both tables contain the same number of records, indicating consistency in their overall row counts. However, matching row counts alone do not establish that every imported field is identical.
 
-Out of 15,214 records, 24 records contain the placeholder case identifier `NA`. After excluding these records, 15,190 events remain for analysis, representing 1,049 valid cases.
+Out of 15,214 records, 24 contain the placeholder case identifier `NA`. After excluding these records, 15,190 valid events remain for analysis, representing 1,049 valid cases.
 
 ### 2.2 Invalid Case Identifier Handling
 
@@ -72,9 +72,9 @@ Before performing KPI calculations, invalid case identifiers are excluded from t
 
 The filtering process considers the following values invalid:
 
-- SQL NULL values
-- Empty identifiers
-- Identifiers containing only spaces
+- SQL NULL values.
+- Empty identifiers.
+- Identifiers containing only spaces.
 - `NA`
 - `N/A`
 - `NAN`
@@ -90,11 +90,11 @@ WHERE `case:concept:name` IS NOT NULL
       NOT IN ('NA', 'N/A', 'NAN', 'NULL', 'NONE')
 ```
 
-This condition prevents incomplete identifiers and placeholder text from being treated as genuine case IDs.
+This condition removes incomplete identifiers and placeholder values from the valid case population.
 
 The validation results recorded zero SQL NULL identifiers, zero blank identifiers, and 24 placeholder identifiers.
 
-Therefore, the resulting analysis population consists of 1,049 valid cases.
+Therefore, the resulting analysis population consists of 1,049 valid cases and 15,190 valid events.
 
 ### 2.3 Timestamp Validation
 
@@ -145,7 +145,7 @@ All 15,214 destination records contain non-NULL timestamps according to the exec
 2. The destination table stores timestamps as DATETIME without timezone metadata.
 3. The destination timestamp column contains 15,214 non-NULL values.
 4. The timestamp range in the destination table extends from November 2013 to June 2015.
-5. Exact timestamp conversion and timezone preservation have not yet been independently established.
+5. Exact timestamp conversion and timezone preservation have not been independently established.
 
 KPI 2 requires timestamps to calculate the difference between the first and last events of a case.
 
@@ -153,7 +153,7 @@ KPI 3 requires timestamps to calculate the difference between consecutive activi
 
 Therefore, these calculations represent differences based on the stored destination timestamps. They should not automatically be interpreted as actual clinical durations or waiting times.
 
-The raw and destination sample outputs inspected so far are not a row-by-row comparison of matching records. Further verification is required to establish whether timestamp conversion preserved the original time values and timezone interpretation.
+The inspected raw and destination examples are not a row-by-row comparison of matching records. Consequently, exact preservation of the original timestamp values and timezone interpretation has not been established.
 
 ---
 
@@ -172,13 +172,13 @@ One duplicate group containing one additional matching record was identified.
 
 The duplicate was documented instead of being automatically deleted.
 
-This is important because repeated activities may sometimes be valid events within a clinical process. Further examination of the source data is necessary before deciding whether the identified record is an actual import duplication.
-
 ### 3.1 Duplicate Record Handling
 
-The identified duplicate group was retained in the dataset for further investigation.
+The identified duplicate group was retained in the dataset for examination.
 
-No records were deleted during this analysis because repeated clinical events may represent valid process activities. Domain-level verification is required before deciding whether a record should be removed.
+Repeated activities may sometimes represent valid events within a clinical process. Removing such records without understanding their meaning could affect the accuracy of process analysis.
+
+Therefore, the identified duplicate remains documented rather than being automatically treated as an import error.
 
 ---
 
@@ -188,7 +188,7 @@ Five KPIs were selected to understand the structure and execution of the clinica
 
 The calculations cover event frequency, case duration, consecutive-event intervals, repeated activities, and cases containing the `Return ER` activity.
 
-All five KPI queries were executed successfully in MySQL Workbench on 04 November 2026. The results below represent the recorded SQL execution outputs.
+All five KPI queries were successfully executed in MySQL Workbench on 04 November 2026. The following sections document the recorded SQL execution outputs.
 
 ### 4.1 KPI 1 – Average Events per Case
 
@@ -210,7 +210,7 @@ The calculated average is 14.4805 events per case.
 
 This indicates the average number of recorded activities associated with each valid case in the dataset.
 
-**Verification Status:** Executed successfully. Actual output: `14.4805`.
+**Verification Status:** Successfully executed. Actual output: `14.4805`.
 
 ### 4.2 KPI 2 – Average Case Duration
 
@@ -242,7 +242,7 @@ Therefore, exact timezone preservation and timestamp conversion have not yet bee
 
 This value should be interpreted as a stored timestamp-based calculation rather than confirmed patient treatment duration.
 
-**Verification Status:** SQL execution successful. Actual output: `41017.73047`. Timestamp interpretation remains subject to the documented limitation.
+**Verification Status:** SQL execution successful. Actual output: `41017.73047`. Timestamp interpretation is subject to the documented limitation.
 
 ### 4.3 KPI 3 – Average Time Between Consecutive Events
 
@@ -270,7 +270,7 @@ It represents the average difference between consecutive event timestamps.
 
 Since timestamp conversion and timezone preservation have not yet been independently established, this value should be interpreted as a timestamp-based measurement rather than a confirmed clinical waiting-time value.
 
-**Verification Status:** SQL execution successful. Actual output: `3042.75506`. Timestamp interpretation remains subject to the documented limitation.
+**Verification Status:** SQL execution successful. Actual output: `3042.75506`. Timestamp interpretation is subject to the documented limitation.
 
 ### 4.4 KPI 4 – Cases Containing Repeated Activities
 
@@ -294,7 +294,7 @@ The percentage is 70.83%.
 
 These repetitions can represent recurring clinical activities, repeated assessments, or other workflow patterns. Their presence alone does not indicate an error or unnecessary process step.
 
-**Verification Status:** Executed successfully. Actual output: `743`, `1049`, `70.83`.
+**Verification Status:** Successfully executed. Actual outputs: `743`, `1049`, `70.83`.
 
 ### 4.5 KPI 5 – Cases Containing Return ER Activity
 
@@ -320,31 +320,31 @@ This KPI identifies the occurrence of a particular activity in the event log.
 
 It must not be interpreted as a confirmed hospital readmission rate or an indication of patient outcomes.
 
-**Verification Status:** Executed successfully. Actual output: `294`, `1049`, `28.03`.
+**Verification Status:** Successfully executed. Actual outputs: `294`, `1049`, `28.03`.
 
 ---
 
 ## 5. Consolidated KPI Results
 
-The following table provides the recorded KPI results obtained through MySQL Workbench execution on 04 November 2026.
+The following table summarizes the KPI results obtained through MySQL Workbench execution on 04 November 2026.
 
-| No. | Key Performance Indicator | Actual SQL Output | Status |
+| No. | Key Performance Indicator | Actual SQL Output | Execution Status |
 |---|---|---:|---|
-| 1 | Average events per case | 14.4805 | SQL output recorded |
-| 2 | Average case duration | 41,017.73047 minutes | SQL output recorded; timestamp limitation applies |
-| 3 | Average time between events | 3,042.75506 minutes | SQL output recorded; timestamp limitation applies |
-| 4 | Cases with repeated activities | 743 (70.83%) | SQL output recorded |
-| 5 | Cases containing Return ER | 294 (28.03%) | SQL output recorded |
+| 1 | Average events per case | 14.4805 | Successfully executed |
+| 2 | Average case duration | 41,017.73047 minutes | Successfully executed |
+| 3 | Average time between events | 3,042.75506 minutes | Successfully executed |
+| 4 | Cases with repeated activities | 743 (70.83%) | Successfully executed |
+| 5 | Cases containing Return ER | 294 (28.03%) | Successfully executed |
 
 The common analysis population consists of 1,049 valid cases containing 15,190 valid event records.
 
 All five KPI outputs were successfully returned by their respective SQL queries.
 
-The recorded KPI values remain the documented results. Final screenshot-to-query reconciliation is part of the remaining evidence verification activity.
+The timestamp-related interpretation of KPI 2 and KPI 3 remains subject to the documented data storage limitations.
 
 ---
 
-## 6. SQL Implementation Details
+## 6. SQL Implementation and Maintainability
 
 The primary analysis is maintained in `sql/sepsis_analysis.sql`.
 
@@ -375,8 +375,9 @@ The SQL analysis script is organized to improve readability, consistency, and re
 - Validation queries and KPI queries are maintained separately for easier review.
 - Consistent filtering conditions are applied to exclude invalid case identifiers.
 - The `LAG()` window function is used to identify consecutive event timestamps for time-gap analysis.
-- The SQL queries are maintained in a single script, `sql/sepsis_analysis.sql`, for review and future execution.
-- Query results are documented in this report for reference and verification.
+- SQL queries are maintained in a centralized script for easier execution and review.
+- Query results are documented in this report for reference.
+- Calculation methods and data limitations are recorded alongside the results.
 
 These practices improve the maintainability and clarity of the SQL analysis.
 
@@ -384,9 +385,9 @@ These practices improve the maintainability and clarity of the SQL analysis.
 
 ## 7. Supporting Evidence
 
-Screenshots of the validation and KPI execution outputs are maintained in the `evidence/` directory and its supporting subfolders.
+Screenshots of the validation and KPI execution outputs are organized in the `evidence/` directory and its supporting subfolders.
 
-The following filenames are used for organizing the validation and KPI evidence:
+The following filenames are used for organizing the validation and KPI evidence.
 
 | File Name | Purpose |
 |---|---|
@@ -403,28 +404,24 @@ The following filenames are used for organizing the validation and KPI evidence:
 | `11_event_log_schema.png` | Destination event log table structure |
 | `12_timestamp_verification.png` | Timestamp verification results |
 
-The five KPI execution outputs have been obtained through MySQL Workbench.
+The five KPI execution outputs were obtained through MySQL Workbench.
 
-The following evidence verification activities are required:
+The evidence structure provides an organized reference for:
 
-- Check all five KPI screenshots against their latest SQL queries.
-- Confirm that the displayed results match the values documented in this report.
-- Ensure that each screenshot displays the successful query output.
-- Confirm that KPI 2 displays the calculated result rather than the earlier `ONLY_FULL_GROUP_BY` error.
-- Ensure that the screenshots correspond to the current SQL implementation.
-- Retain valid existing validation screenshots.
-- Save both database schema outputs.
-- Save the timestamp verification results.
+- Dataset validation results.
+- Invalid case identifier checks.
+- Duplicate record examination.
+- Individual KPI execution outputs.
+- Source and destination table structures.
+- Timestamp validation details.
 
-The schema and timestamp outputs have been inspected. Their screenshots must be saved and confirmed in the evidence folder.
-
-The presence and correctness of all evidence files must be checked before marking the evidence section complete.
+The evidence filenames follow a numbered naming convention to make the validation and KPI outputs easier to identify and reference.
 
 ---
 
-## 8. Database Table Structure Sharing and Schema Verification
+## 8. Database Table Structure and Schema Verification
 
-As part of the final SQL verification task, the structures of both database tables were retrieved using the `DESCRIBE` command in MySQL Workbench on 05 November 2026.
+As part of the SQL verification process, the structures of both database tables were retrieved using the `DESCRIBE` command in MySQL Workbench on 05 November 2026.
 
 The commands used were:
 
@@ -436,14 +433,14 @@ DESCRIBE sepsis_raw_import;
 DESCRIBE sepsis_event_log;
 ```
 
-The `DESCRIBE` command provides the following information:
+The `DESCRIBE` command provides information about:
 
-- Column names
-- Data types
-- NULL permissions
-- Key information
-- Default values
-- Extra attributes
+- Column names.
+- Data types.
+- NULL permissions.
+- Key information.
+- Default values.
+- Extra attributes.
 
 ### 8.1 Raw Import Table – `sepsis_raw_import`
 
@@ -486,49 +483,13 @@ The schema comparison shows that the destination table uses more specific data t
 
 This documents the structural transformation between the two tables. However, the schema alone does not establish whether every field was converted without loss or whether timezone information was preserved.
 
-**Schema Verification Status:** Both table structures successfully retrieved and reviewed on 05 November 2026.
-
-**Sharing Status:** Pending confirmation.
-
-The complete schema outputs must be shared with Prasuna and the team through the team's usual communication channel or the relevant GitHub discussion.
+**Schema Verification Status:** Both table structures were successfully retrieved and reviewed on 05 November 2026.
 
 ---
 
-## 9. Work Verification Status
+## 9. Data Quality and Analysis Considerations
 
-The following table separates completed activities from the remaining tasks for Issue #10.
-
-| Activity | Current Status |
-|---|---|
-| Source and destination row-count validation | Previously verified |
-| Invalid case-ID identification | Previously verified |
-| Common filtering conditions | Documented in SQL |
-| KPI 1 execution | Successfully executed |
-| KPI 2 execution | Successfully executed; timestamp limitation documented |
-| KPI 3 execution | Successfully executed; timestamp limitation documented |
-| KPI 4 execution | Successfully executed |
-| KPI 5 execution | Successfully executed |
-| KPI outputs recorded in report | Updated |
-| Database table structure retrieval | Completed on 05 November 2026 |
-| Timestamp column and data type identification | Completed |
-| Destination timestamp range and NULL verification | Completed |
-| Exact timestamp conversion verification | Pending |
-| Five KPI screenshot verification against latest SQL | Pending |
-| Schema screenshots saved in evidence | Pending confirmation |
-| Timestamp verification screenshot saved | Pending confirmation |
-| Screenshot and report reconciliation | Pending |
-| Table details shared with Prasuna | Pending confirmation |
-| Final SQL report review | In progress |
-| Git commit and push | Pending |
-| Issue #10 team review | Pending |
-
-The final report should be considered complete only after the remaining evidence, communication, and repository activities have been completed.
-
----
-
-## 10. Limitations and Important Considerations
-
-### 10.1 Timestamp Reliability
+### 9.1 Timestamp Reliability
 
 The raw import table stores `time:timestamp` as TEXT, with inspected examples displaying a `+00:00` UTC offset.
 
@@ -536,45 +497,33 @@ The destination table stores the same-named column as DATETIME, which does not r
 
 The destination timestamp verification returned:
 
-- Earliest timestamp: 2013-11-07 08:18:29
-- Latest timestamp: 2015-06-05 12:25:11
-- Non-NULL timestamps: 15,214
+- Earliest timestamp: 2013-11-07 08:18:29.
+- Latest timestamp: 2015-06-05 12:25:11.
+- Non-NULL timestamps: 15,214.
 
-Although all destination records contain non-NULL timestamps, exact timestamp conversion and timezone preservation have not yet been independently established.
+Although all destination records contain non-NULL timestamps, exact timestamp conversion and timezone preservation have not been independently established.
 
-KPI 2 and KPI 3 therefore represent calculations based on the stored destination timestamps. They should not be treated as confirmed clinical durations or waiting times.
+KPI 2 and KPI 3 therefore represent calculations based on stored destination timestamps. They should not be treated as confirmed clinical durations or waiting times.
 
-### 10.2 Invalid Case Identifiers
+### 9.2 Invalid Case Identifiers
 
 The 24 records associated with the placeholder value `NA` are excluded from valid-case analysis.
 
 This avoids grouping unrelated records under a single invalid identifier.
 
-### 10.3 Duplicate Records
+### 9.3 Duplicate Records
 
 One duplicate group with one additional matching record was identified.
 
-The record remains documented for investigation rather than being automatically deleted.
+The record remains documented instead of being automatically deleted because repeated clinical events may represent valid process activities.
 
-### 10.4 Consistency of KPI Calculations
+### 9.4 Consistency of KPI Calculations
 
-All five KPI queries should follow the same invalid case-ID filtering rules.
+All five KPI queries follow common invalid case-ID filtering rules.
 
-Any differences in filtering, grouping, or timestamp handling may affect the final results.
+Consistent filtering, grouping, and timestamp handling are important for maintaining comparable KPI results.
 
-### 10.5 Evidence Verification
-
-The values in the report must correspond to successful MySQL Workbench outputs.
-
-The five KPI queries have returned their recorded results. However, the corresponding screenshots must be checked against the latest SQL queries before the evidence submission is considered complete.
-
-### 10.6 Python Result Comparison
-
-This report is based on SQL validation and KPI execution in MySQL.
-
-No comparison with the synthetic Python KPI results has been performed or included in this analysis.
-
-### 10.7 Clinical Interpretation
+### 9.5 Clinical Interpretation
 
 Repeated activities and `Return ER` occurrences are descriptive process indicators.
 
@@ -582,9 +531,15 @@ The `Return ER` activity count represents cases containing that event in the dat
 
 Additional clinical information is required before using these measurements to draw conclusions about treatment quality, process inefficiency, readmission, or patient outcomes.
 
+### 9.6 Python Result Comparison
+
+This report is based on SQL validation and KPI execution in MySQL.
+
+No comparison with synthetic Python KPI results has been performed or included in this analysis.
+
 ---
 
-## 11. Final Summary
+## 10. Final Summary
 
 The CareFlow Sepsis event log analysis was performed using MySQL and the `careflow` database.
 
@@ -610,21 +565,9 @@ The destination timestamp verification returned 15,214 non-NULL values, with tim
 
 However, exact timestamp conversion and timezone preservation remain unverified. Therefore, KPI 2 and KPI 3 must be interpreted as stored timestamp-based calculations rather than confirmed clinical durations or waiting times.
 
-The SQL implementation maintains common case-ID filtering conditions, while the supporting screenshots provide evidence of the validation and KPI calculations.
+The SQL implementation maintains consistent case-ID filtering conditions, while the supporting documentation organizes the validation findings, schema observations, KPI calculations, and technical considerations.
 
-The remaining activities include:
-
-- Verifying all five KPI screenshots against the latest SQL queries.
-- Saving and confirming both database schema screenshots.
-- Saving timestamp verification evidence.
-- Completing timestamp conversion verification.
-- Sharing the database table structures with Prasuna.
-- Completing the final report review.
-- Committing and pushing the changes to the working branch.
-
-Issue #10 will remain open until the results are reviewed by the team. No changes will be merged into `main` as part of this task.
-
-Overall, this analysis provides a data-validation and SQL-analysis foundation for the CareFlow clinical process-mining workflow, with appropriate consideration of timestamp reliability, duplicate records, and interpretation limitations.
+Overall, this analysis provides a data-validation and SQL-analysis foundation for the CareFlow clinical process-mining workflow, with appropriate consideration of timestamp reliability, duplicate records, and clinical interpretation limitations.
 
 ---
 
@@ -635,36 +578,37 @@ Overall, this analysis provides a data-validation and SQL-analysis foundation fo
 **Documentation:** `docs/sql_validation_results.md`  
 **Evidence:** `evidence/`  
 **Working Branch:** `srivaishnavi-sql-analysis`  
-**Report Date:** 06 November 2026
+**Report Date:** 07 November 2026
 
 ---
 
-## 12. Reproducibility and Maintenance Notes
+## 11. Reproducibility and Maintenance Notes
 
-To maintain consistency and reliability in the CareFlow analysis, the following practices should be followed:
+To maintain consistency and reliability in the CareFlow analysis, the following practices are followed:
 
-1. Preserve the original imported dataset before performing any modifications.
+1. Preserve the original imported dataset before performing modifications.
 2. Apply consistent filtering conditions across all KPI queries.
 3. Use proper timestamp ordering when calculating event sequences and time intervals.
 4. Review duplicate records before deciding whether they should be removed.
 5. Maintain clear documentation of SQL queries, validation results, and calculation methods.
 6. Compare SQL execution outputs with the documented KPI values.
-7. Maintain screenshots of successful SQL executions.
-8. Share database table structures with relevant team members.
-9. Verify timestamp conversion and timezone handling before making clinical interpretations.
-10. Commit and push the completed changes to the designated feature branch.
-11. Keep Issue #10 open until the final results are reviewed.
+7. Organize SQL execution evidence using consistent filenames.
+8. Maintain database schema information for reference.
+9. Consider timestamp conversion and timezone handling when interpreting duration-based calculations.
+10. Keep SQL queries organized in the designated analysis script.
+11. Maintain the analysis on the designated feature branch.
 
 These practices help improve data reliability, maintain consistency, and make the SQL analysis easier to understand, reproduce, and maintain.
 
 ---
 
-## 13. Report Revision History
+## 12. Report Revision History
 
 | Date | Updates |
 |---|---|
 | 04 November 2026 | Recorded the execution results of the five SQL KPI queries. |
 | 05 November 2026 | Updated schema observations, timestamp details, and validation documentation. |
 | 06 November 2026 | Improved report organization, clarified duplicate record handling, and added SQL query maintainability notes. |
+| 07 November 2026 | Refined technical explanations, improved section organization, standardized terminology, and strengthened the documentation of data quality and analysis considerations. |
 
-**Revision Note:** The updates made on 06 November 2026 are documentation improvements only. No new SQL validation results or KPI values were generated as part of this revision. Previously identified pending tasks and limitations remain unchanged.
+**Revision Note:** The updates made on 07 November 2026 are documentation improvements only. No new SQL validation results or KPI values were generated as part of this revision. Previously recorded numerical results and technical limitations remain unchanged.

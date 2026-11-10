@@ -100,8 +100,8 @@ The following row counts are based on the team's reported findings. They are exp
 | Stage | Validation | Expected Row Count | Status |
 |---|---|---:|---|
 | 0 | Original CSV row count | 15,214 | Team-reported; verification pending |
-| 1 | After excluding 24 records with missing Case IDs | 15,190 | Team-reported; verification pending |
-| 2 | After removing 7 repeated Case ID, activity, and timestamp combinations | 15,183 | Team-reported; verification and team approval pending |
+| 1 | After proposed review and exclusion of 24 records with literal `NA` Case IDs | 15,190 | Pending team approval |
+| 2 | After proposed review and possible removal of 7 extra repeated event-key occurrences | 15,183 | Pending investigation and team approval |
 | 3 | Exact duplicate row validation | To be determined | Pending |
 | 4 | Timestamp validation | To be determined | Pending |
 | 5 | Activity-name validation | To be determined | Pending |
@@ -124,7 +124,7 @@ The following schema findings have been checked against the available CSV header
 The following data quality counts have been reported by the team and are **pending independent verification**:
 
 - Raw event count: 15,214
-- Events with missing Case IDs: 24
+- Case IDs containing literal NA: 24
 - Repeated Case ID, activity, and timestamp combinations: 7
 - Reported prepared event count: 15,183
 
@@ -177,11 +177,11 @@ Issue #9 must remain open until the team reviews and approves the documentation 
 
 The data preparation plan documents the proposed procedure. It does not claim that the preparation process has been executed or that the final prepared event log has been independently verified.
 
-## Excel-Based Data Quality Verification
+## Excel-Based Data Quality Review
 
 The Sepsis Cases – Event Log dataset was reviewed using Microsoft Excel.
 
-### Verification Results
+### Reported Excel Review Findings
 
 | Check | Result |
 |---|---:|
@@ -194,10 +194,9 @@ The Sepsis Cases – Event Log dataset was reviewed using Microsoft Excel.
 | Repeated Case ID + Activity + Timestamp occurrences | 7 |
 
 ### Proposed Cleaning Checkpoints
-
 - Original records: 15,214
 - After proposed review and exclusion of 24 `NA` Case ID records: 15,190
-- After proposed removal of 7 extra repeated event-key occurrences: 15,183
+- After proposed review and possible removal of 7 extra repeated event-key occurrences, subject to investigation and team approval: 15,183
 
 ### Cleaning Status
 
